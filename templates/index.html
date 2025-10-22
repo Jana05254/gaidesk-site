@@ -1,51 +1,39 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>لوحة عرض Firebase</title>
-  <style>
-    body { font-family: Arial, "Noto Naskh Arabic", sans-serif; background:#f5f7fb; color:#111; padding:20px; }
-    h1 { color:#0b57a4; }
-    button { background:#0b57a4; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
-    .card { background:white; padding:12px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08); margin:8px 0; }
-    pre { white-space:pre-wrap; word-break:break-word; }
-  </style>
-</head>
-<body>
-  <h1>لوحة عرض بيانات Firebase (من خلال السيرفر)</h1>
-  <button onclick="loadData()">تحديث البيانات</button>
-  <span id="status">جاهز</span>
-  <div id="list"></div>
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">لوحة بيانات Firebase</h4>
 
-  <script>
-    async function loadData() {
-      const status = document.getElementById('status');
-      const list = document.getElementById('list');
-      status.textContent = 'جارِ تحميل البيانات...';
-      try {
-        const r = await fetch('/api/data?limit=20');
-        const items = await r.json();
-        list.innerHTML = '';
-        if (!items.length) {
-          list.innerHTML = '<div class="card">لا توجد بيانات بعد</div>';
-        } else {
-          for (const it of items) {
-            const el = document.createElement('div');
-            el.className = 'card';
-            el.innerHTML = `<strong>المفتاح:</strong> ${it.key}<br><pre>${JSON.stringify(it.value, null, 2)}</pre>`;
-            list.appendChild(el);
-          }
-        }
-        status.textContent = 'تم التحديث ✅';
-      } catch (e) {
-        status.textContent = 'خطأ في الاتصال 😢';
-      }
-    }
+<div class="row g-3">
+  <div class="col-12 col-md-3"><div class="card p-3"><div class="text-muted">آخر حرارة</div><div class="display-6 fw-bold" id="m-temp">–</div></div></div>
+  <div class="col-12 col-md-3"><div class="card p-3"><div class="text-muted">آخر CO₂</div><div class="display-6 fw-bold" id="m-co2">–</div></div></div>
+  <div class="col-12 col-md-3"><div class="card p-3"><div class="text-muted">آخر وجود</div><div class="display-6 fw-bold" id="m-presence">–</div></div></div>
+  <div class="col-12 col-md-3"><div class="card p-3"><div class="text-muted">عدد القراءات</div><div class="display-6 fw-bold" id="m-count">0</div></div></div>
+</div>
 
-    // تحميل تلقائي عند الدخول + كل 10 ثواني
-    loadData();
-    setInterval(loadData, 10000);
-  </script>
-</body>
-</html>
+<div class="card p-3 mt-3">
+  <div class="d-flex justify-content-between align-items-center">
+    <h6 class="mb-0">الرسم البياني</h6>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+      <label class="form-check-label" for="autoRefresh">تحديث تلقائي</label>
+    </div>
+  </div>
+  <canvas id="chart" height="90" class="mt-2"></canvas>
+</div>
+
+<div class="card p-3 mt-3">
+  <h6>آخر 25 قراءة</h6>
+  <div class="table-responsive" style="max-height:420px;">
+    <table class="table align-middle">
+      <thead><tr><th>الوقت</th><th>°C</th><th>CO₂</th><th>وجود</th><th>خطر</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.DASH_LIMIT = 25;
+</script>
+{% endblock %}
+

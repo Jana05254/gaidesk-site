@@ -1,5 +1,5 @@
-import os, tempfile, json, time
-from flask import Flask, jsonify, request, render_template
+import os, tempfile, time, json
+from flask import Flask, jsonify, request, render_template, send_from_directory, abort
 from flask_cors import CORS
 from dotenv import load_dotenv
 import firebase_admin
@@ -7,19 +7,16 @@ from firebase_admin import credentials, db
 
 load_dotenv()
 
-# اقرأ القيم من المتغيرات (لا تحطيها ثابتة في الكود)
 DATABASE_URL = os.getenv("DATABASE_URL")
 API_TOKEN    = os.getenv("API_TOKEN", "CHANGE_ME_32CHARS")
 PORT         = int(os.getenv("PORT", "5000"))
 
-# مفتاح الخدمة: من متغير بيئة في السحابة أو من ملف محلي للتجربة
 SERVICE_ACCOUNT_JSON = os.getenv("SERVICE_ACCOUNT_JSON")
-SERVICE_ACCOUNT_PATH = os.getenv("SERVICE_ACCOUNT_PATH")  # محلي فقط (اختياري)
+SERVICE_ACCOUNT_PATH = os.getenv("SERVICE_ACCOUNT_PATH")
 
 if SERVICE_ACCOUNT_JSON:
     fd, tmp = tempfile.mkstemp(suffix=".json")
-    with os.fdopen(fd, "w", encoding="utf-8") as f:
-        f.write(SERVICE_ACCOUNT_JSON)
+    with os.fdopen(fd, "w", encoding="utf-8") as f: f.write(SERVICE_ACCOUNT_JSON)
     cred = credentials.Certificate(tmp)
 elif SERVICE_ACCOUNT_PATH and os.path.exists(SERVICE_ACCOUNT_PATH):
     cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
@@ -28,43 +25,77 @@ else:
 
 firebase_admin.initialize_app(cred, {"databaseURL": DATABASE_URL})
 
-app = Flask(__name__, template_folder="templates")
+app = Flask(__name__, template_folder="templates", static_folder="static")
 CORS(app)
 
-# الصفحة الرئيسية
+# ---------- صفحات الموقع ----------
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("index.html", title="لوحة GAIDESK")
 
-# قراءة آخر البيانات
+@app.route("/devices")
+def devices_page():
+    return render_template("devices.html", title="الأجهزة")
+
+@app.route("/api-docs")
+def api_docs():
+    return render_template("api.html", title="توثيق API")
+
+@app.route("/about")
+def about():
+    return render_template("about.html", title="عن GAIDESK")
+
+# ---------- REST API ----------
+def _ref(path="data"):
+    return db.reference(path)
+
 @app.route("/api/data")
 def api_data():
-    ref = db.reference("data")
-    snap = ref.order_by_key().limit_to_last(50).get() or {}
-    items = []
-    # نحوّل القاموس إلى قائمة مرتبة تنازلياً بالمفتاح
-    for k in sorted(snap.keys(), reverse=True):
-        items.append({"key": k, "value": snap[k]})
+    """أرجع آخر القراءات (افتراضي 50). ?limit=25 &device=GAIDESK-01"""
+    limit = max(1, min(int(request.args.get("limit", 50)), 200))
+    device = request.args.get("device")  # اختياري: فلترة جهاز
+    base = "data" if not device else f"data/{device}"
+    snap = _ref(base).order_by_key().limit_to_last(limit).get() or {}
+    items = [{"key": k, "value": snap[k]} for k in sorted(snap.keys(), reverse=True)]
     return jsonify(items)
 
-# كتابة (محمي بتوكن Bearer)
+@app.route("/api/devices")
+def api_devices():
+    """أسماء الأجهزة تحت /data/*"""
+    snap = _ref("data").get() or {}
+    names = sorted(list(snap.keys())) if all(isinstance(v, dict) and any(isinstance(x, dict) for x in v.values()) for v in snap.values()) else ["GAIDESK-01"]
+    # محاولة استنتاج البنية؛ إن ما فيه أجهزة فرعية رجّعي جهاز افتراضي
+    return jsonify(names)
+
 @app.route("/api/post", methods=["POST"])
 def api_post():
+    """استقبال قراءة من جهاز (محمية بـ Bearer)"""
     auth = request.headers.get("Authorization", "")
-    if not auth.startswith("Bearer "):
-        return jsonify({"error": "missing bearer token"}), 401
-    token = auth.split(" ", 1)[1].strip()
-    if token != API_TOKEN:
-        return jsonify({"error": "invalid token"}), 403
+    if not auth.startswith("Bearer "): return jsonify({"error": "missing bearer token"}), 401
+    if auth.split(" ", 1)[1].strip() != API_TOKEN: return jsonify({"error": "invalid token"}), 403
 
     payload = request.get_json(silent=True)
-    if not isinstance(payload, dict):
-        return jsonify({"error": "invalid json"}), 400
+    if not isinstance(payload, dict): return jsonify({"error": "invalid json"}), 400
 
-    # مفتاح تلقائي (مثلاً طابع زمني)
+    device = payload.pop("device", "GAIDESK-01")
     key = str(int(time.time() * 1000))
-    db.reference("data").child(key).set(payload)
-    return jsonify({"ok": True, "key": key})
+    _ref(f"data/{device}").child(key).set(payload)
+    return jsonify({"ok": True, "device": device, "key": key})
+
+# ملفات ثابتة إضافية إن احتجت
+@app.route("/favicon.ico")
+def favicon():
+    p = os.path.join(app.root_path, "static")
+    if os.path.exists(os.path.join(p, "favicon.ico")):
+        return send_from_directory(p, "favicon.ico", mimetype="image/x-icon")
+    abort(404)
+
+# أخطاء جميلة
+@app.errorhandler(404)
+def not_found(e): return render_template("404.html", title="غير موجود"), 404
+
+@app.errorhandler(500)
+def err500(e): return render_template("500.html", title="خطأ داخلي"), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=PORT, debug=False)

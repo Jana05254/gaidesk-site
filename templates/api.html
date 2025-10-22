@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">توثيق API</h4>
+
+<div class="card p-3 mb-3">
+  <h6>GET /api/data</h6>
+  <p class="text-muted">يعيد آخر القراءات. معاملات:</p>
+  <ul>
+    <li><code>?limit=50</code> (اختياري، افتراضي 50، أقصى 200)</li>
+    <li><code>?device=GAIDESK-01</code> (اختياري)</li>
+  </ul>
+  <pre><code>curl {{ request.host_url.rstrip('/') }}/api/data?limit=10</code></pre>
+</div>
+
+<div class="card p-3">
+  <h6>POST /api/post</h6>
+  <p class="text-muted">إرسال قراءة (محمية بـ Bearer Token).</p>
+  <pre><code>curl -X POST {{ request.host_url.rstrip('/') }}/api/post \
+ -H "Authorization: Bearer YOUR_TOKEN" \
+ -H "Content-Type: application/json" \
+ -d '{"device":"GAIDESK-01","t":26.1,"co2":520,"presence":1,"risk":0.12,"ts":1690000000000}'</code></pre>
+</div>
+{% endblock %}
