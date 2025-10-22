@@ -31,11 +31,26 @@ CORS(app)
 # ---------- صفحات الموقع ----------
 @app.route("/")
 def home():
+    # صفحة تعريف (Landing) — لازم يكون عندك templates/landing.html
+    return render_template("landing.html", title="GAIDESK")
+
+@app.route("/app")
+def app_page():
+    # لوحتك الحالية (اللي كانت على /) وتعرض index.html
     return render_template("index.html", title="لوحة GAIDESK")
 
 @app.route("/devices")
 def devices_page():
     return render_template("devices.html", title="الأجهزة")
+
+@app.route("/weekly")
+def weekly_page():
+    return render_template("weekly.html", title="أسبوعك")
+
+@app.route("/alerts")
+def alerts_page():
+    return render_template("alerts.html", title="إعدادات التنبيه")
+
 
 @app.route("/api-docs")
 def api_docs():
