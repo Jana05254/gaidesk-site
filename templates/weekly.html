@@ -1,0 +1,35 @@
+{% extends "base.html" %}{% block content %}
+<h4 class="mb-3">أسبوعك</h4>
+<div class="row g-3">
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted">الجلسات</div><div class="display-6 fw-bold" id="m-sessions">–</div></div></div>
+  <div class="col-md-3"><div class="card p-3"><div class="text-muted">متوسط الإجهاد</div><div class="display-6 fw-bold" id="m-strain">–</div></div></div>
+  <div class="col-md-6"><div class="card p-3"><canvas id="wchart" height="80"></canvas></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+<script>
+(async()=>{
+  // تجميع بسيط من /api/data (عميلًا) — استبدليه لاحقًا بAPI أدق
+  const r=await fetch('/api/data?limit=200'); const data=await r.json();
+  const byDay={}; // YYYY-MM-DD -> {n, strainSum}
+  data.forEach(i=>{
+    const v=i.value||{}; const d=new Date(Number(v.ts||i.key));
+    if(isNaN(d)) return;
+    const day=d.toISOString().slice(0,10);
+    byDay[day]=byDay[day]||{n:0, strainSum:0};
+    byDay[day].n++; byDay[day].strainSum += Number(v.strain||0);
+  });
+  const days=Object.keys(byDay).sort().slice(-7);
+  const sessions=days.reduce((a,k)=>a+byDay[k].n,0);
+  const strainAvg=days.length? (days.reduce((a,k)=>a+byDay[k].strainSum,0)/days.reduce((a,k)=>a+byDay[k].n,0)):0;
+  document.getElementById('m-sessions').textContent = sessions;
+  document.getElementById('m-strain').textContent   = (strainAvg*100).toFixed(0)+'%';
+
+  const ctx=document.getElementById('wchart').getContext('2d');
+  new Chart(ctx,{type:'bar',data:{labels:days,
+    datasets:[{label:'متوسط الإجهاد اليومي %', data:days.map(k=> (byDay[k].strainSum/byDay[k].n)*100), borderWidth:2}]},
+    options:{responsive:true,scales:{y:{beginAtZero:true,max:100}}}});
+})();
+</script>
+{% endblock %}
