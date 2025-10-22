@@ -1,4 +1,4 @@
-import os, tempfile
+import os, tempfile, json, time
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -6,13 +6,15 @@ import firebase_admin
 from firebase_admin import credentials, db
 
 load_dotenv()
-DATABASE_URL = os.getenv("https://gaidesk-default-rtdb.asia-southeast1.firebasedatabase.app/")
-API_TOKEN    = os.getenv("API_TOKEN", "JANA_FIREBASE_EDGE_2025_KEY")
+
+# اقرأ القيم من المتغيرات (لا تحطيها ثابتة في الكود)
+DATABASE_URL = os.getenv("DATABASE_URL")
+API_TOKEN    = os.getenv("API_TOKEN", "CHANGE_ME_32CHARS")
 PORT         = int(os.getenv("PORT", "5000"))
 
-# خذي المفتاح من متغير بيئة (آمن على السحابة)
+# مفتاح الخدمة: من متغير بيئة في السحابة أو من ملف محلي للتجربة
 SERVICE_ACCOUNT_JSON = os.getenv("SERVICE_ACCOUNT_JSON")
-SERVICE_ACCOUNT_PATH = os.getenv("SERVICE_ACCOUNT_PATH")  # اختياري للمحلي
+SERVICE_ACCOUNT_PATH = os.getenv("SERVICE_ACCOUNT_PATH")  # محلي فقط (اختياري)
 
 if SERVICE_ACCOUNT_JSON:
     fd, tmp = tempfile.mkstemp(suffix=".json")
@@ -26,10 +28,43 @@ else:
 
 firebase_admin.initialize_app(cred, {"databaseURL": DATABASE_URL})
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 CORS(app)
 
-# ... باقي مساراتك كما هي ...
+# الصفحة الرئيسية
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+# قراءة آخر البيانات
+@app.route("/api/data")
+def api_data():
+    ref = db.reference("data")
+    snap = ref.order_by_key().limit_to_last(50).get() or {}
+    items = []
+    # نحوّل القاموس إلى قائمة مرتبة تنازلياً بالمفتاح
+    for k in sorted(snap.keys(), reverse=True):
+        items.append({"key": k, "value": snap[k]})
+    return jsonify(items)
+
+# كتابة (محمي بتوكن Bearer)
+@app.route("/api/post", methods=["POST"])
+def api_post():
+    auth = request.headers.get("Authorization", "")
+    if not auth.startswith("Bearer "):
+        return jsonify({"error": "missing bearer token"}), 401
+    token = auth.split(" ", 1)[1].strip()
+    if token != API_TOKEN:
+        return jsonify({"error": "invalid token"}), 403
+
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({"error": "invalid json"}), 400
+
+    # مفتاح تلقائي (مثلاً طابع زمني)
+    key = str(int(time.time() * 1000))
+    db.reference("data").child(key).set(payload)
+    return jsonify({"ok": True, "key": key})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=PORT, debug=False)
