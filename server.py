@@ -78,9 +78,9 @@ def api_data():
 def api_devices():
     """أسماء الأجهزة تحت /data/*"""
     snap = _ref("data").get() or {}
-    names = sorted(list(snap.keys())) if all(isinstance(v, dict) and any(isinstance(x, dict) for x in v.values()) for v in snap.values()) else ["GAIDESK-01"]
-    # محاولة استنتاج البنية؛ إن ما فيه أجهزة فرعية رجّعي جهاز افتراضي
-    return jsonify(names)
+    # إذا كانت البنية data/<device>/<timestamp> رجّعي الأسماء، وإلا جهاز افتراضي
+    devices = sorted(snap.keys()) if isinstance(snap, dict) and all(isinstance(v, dict) for v in snap.values()) else ["GAIDESK-01"]
+    return jsonify(devices)
 
 @app.route("/api/post", methods=["POST"])
 def api_post():
