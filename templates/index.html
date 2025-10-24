@@ -640,279 +640,319 @@
   </footer>
 
   <!-- ====== JS (نفس المنطق السابق) ====== -->
-  <script>
-    const lastUpdatedEl   = document.getElementById('lastUpdated');
-    const presenceBadgeEl = document.getElementById('presenceBadge');
-    const presenceValEl   = document.getElementById('presenceVal');
+ <script>
+  // نخلي اسم الجهاز ثابت وحلو بدل الاسم العشوائي
+  // عدليه لو تبين تسمية ثانية
+  let deviceName = "GAIDESK-01";
 
-    const co2ValEl        = document.getElementById('co2Val');
-    const co2QualityEl    = document.getElementById('co2Quality');
+  // عناصر واجهة المستخدم
+  const lastUpdatedEl     = document.getElementById('lastUpdated');
+  const presenceBadgeEl   = document.getElementById('presenceBadge');
+  const presenceValEl     = document.getElementById('presenceVal');
 
-    const tempValEl       = document.getElementById('tempVal');
-    const tempComfortEl   = document.getElementById('tempComfort');
+  const co2ValEl          = document.getElementById('co2Val');
+  const co2QualityEl      = document.getElementById('co2Quality');
 
-    const fatigueNumEl    = document.getElementById('fatigueNum');
-    const fatigueRingEl   = document.getElementById('fatigueRing');
-    const fatigueHintEl   = document.getElementById('fatigueHint');
+  const tempValEl         = document.getElementById('tempVal');
+  const tempComfortEl     = document.getElementById('tempComfort');
 
-    const readingsBodyEl  = document.getElementById('readingsBody');
-    const chartDeviceNameEl = document.getElementById('chartDeviceName');
-    const tableMetaEl     = document.getElementById('tableMeta');
+  const fatigueNumEl      = document.getElementById('fatigueNum');
+  const fatigueRingEl     = document.getElementById('fatigueRing');
+  const fatigueHintEl     = document.getElementById('fatigueHint');
 
-    const refreshToggleEl = document.getElementById('refreshToggle');
-    const yearNowEl       = document.getElementById('yearNow');
-    yearNowEl.textContent = new Date().getFullYear().toString();
+  const readingsBodyEl    = document.getElementById('readingsBody');
+  const chartDeviceNameEl = document.getElementById('chartDeviceName');
+  const tableMetaEl       = document.getElementById('tableMeta');
 
-    const chartCanvas = document.getElementById('chartCanvas');
-    const ctx = chartCanvas.getContext('2d');
+  const refreshToggleEl   = document.getElementById('refreshToggle');
+  const yearNowEl         = document.getElementById('yearNow');
+  yearNowEl.textContent   = new Date().getFullYear().toString();
 
-    let autoRefresh = true;
-    refreshToggleEl.addEventListener('click', () => {
-      autoRefresh = !autoRefresh;
-      refreshToggleEl.classList.toggle('active', autoRefresh);
+  const chartCanvas = document.getElementById('chartCanvas');
+  const ctx = chartCanvas.getContext('2d');
+
+  // سويتش التحديث التلقائي
+  let autoRefresh = true;
+  refreshToggleEl.addEventListener('click', () => {
+    autoRefresh = !autoRefresh;
+    refreshToggleEl.classList.toggle('active', autoRefresh);
+  });
+
+  // آخر بيانات قريناها
+  let latestData = [];
+
+  // -------- Helpers لعرض الحالة --------
+  function co2Status(ppm){
+    if (ppm == null || isNaN(ppm))
+      return {label:"—", color:"var(--text-dim)"};
+    if (ppm < 800)
+      return {label:"ممتاز", color:"var(--ok)"};
+    if (ppm < 1200)
+      return {label:"مقبول", color:"var(--warn)"};
+    if (ppm < 2000)
+      return {label:"سيّء", color:"var(--bad)"};
+    return {label:"خطر", color:"var(--bad)"};
+  }
+
+  function tempStatus(c){
+    if (c == null || isNaN(c))
+      return {label:"—", color:"var(--text-dim)"};
+    if (c >= 20 && c <= 26)
+      return {label:"مريح", color:"var(--ok)"};
+    return {label:"غير مريح", color:"var(--warn)"};
+  }
+
+  function fatigueColor(pct){
+    if (pct >= 100) return "var(--bad)";
+    if (pct >= 70)  return "var(--warn)";
+    return "var(--ok)";
+  }
+
+  function fmtFullTimeFromTS(ts){
+    if (!ts) return "—";
+    const d = new Date(ts);
+    // نعرض تاريخ/وقت عربي
+    return d.toLocaleString('ar-SA', {
+      year: 'numeric', month:'short', day:'numeric',
+      hour:'2-digit', minute:'2-digit'
     });
+  }
 
-    let latestData = [];
-    let deviceName = "GAIDESK-01";
+  // -------- رسم الرسم البياني --------
+  function drawChart(){
+    // ناخذ آخر 20 قراءة عشان الرسم
+    const pts = latestData.slice(0,20).reverse();
+    const w = chartCanvas.width = chartCanvas.clientWidth;
+    const h = chartCanvas.height = 200;
 
-    function co2Status(ppm){
-      if (ppm == null || isNaN(ppm))
-        return {label:"—", color:"var(--text-dim)"};
-      if (ppm < 800)
-        return {label:"ممتاز", color:"var(--ok)"};
-      if (ppm < 1200)
-        return {label:"مقبول", color:"var(--warn)"};
-      if (ppm < 2000)
-        return {label:"سيّء", color:"var(--bad)"};
-      return {label:"خطر", color:"var(--bad)"};
+    ctx.clearRect(0,0,w,h);
+
+    // خلفية بلون النعناع الفاتح
+    ctx.fillStyle = "rgba(223,238,224,0.4)";
+    ctx.fillRect(0,0,w,h);
+
+    // grid خفيف
+    ctx.strokeStyle = "rgba(43,36,26,.07)";
+    ctx.lineWidth = 1;
+    for(let i=1;i<4;i++){
+      const y = (h/4)*i;
+      ctx.beginPath();
+      ctx.moveTo(0,y);
+      ctx.lineTo(w,y);
+      ctx.stroke();
     }
 
-    function tempStatus(c){
-      if (c == null || isNaN(c))
-        return {label:"—", color:"var(--text-dim)"};
-      if (c >= 20 && c <= 26)
-        return {label:"مريح", color:"var(--ok)"};
-      return {label:"غير مريح", color:"var(--warn)"};
+    const co2Vals   = pts.map(p => p.co2 ?? null);
+    const tempVals  = pts.map(p => p.t ?? null);
+    const fVals     = pts.map(p => p.F ?? null);
+
+    function scaleY(arr,minOverride=null,maxOverride=null){
+      const valid = arr.filter(v => v!=null && !isNaN(v));
+      if (!valid.length)
+        return { fn:()=>h/2, min:0, max:1 };
+      let min = (minOverride!=null)?minOverride:Math.min(...valid);
+      let max = (maxOverride!=null)?maxOverride:Math.max(...valid);
+      if (min===max){ max = min+1; }
+      return {
+        min,max,
+        fn:(val)=>{
+          if(val==null||isNaN(val)) return null;
+          const norm = (val - min)/(max-min);
+          return h - norm*h;
+        }
+      };
     }
 
-    function fatigueColor(pct){
-      if (pct >= 100) return "var(--bad)";
-      if (pct >= 70)  return "var(--warn)";
-      return "var(--ok)";
-    }
+    const co2Scale  = scaleY(co2Vals, 400);
+    const tempScale = scaleY(tempVals, 15,35);
+    const fScale    = scaleY(fVals, 0, 100);
 
-    function fmtFullTimeFromTS(ts){
-      if (!ts) return "—";
-      const d = new Date(ts);
-      return d.toLocaleString('ar-SA', {
-        year: 'numeric', month:'short', day:'numeric',
-        hour:'2-digit', minute:'2-digit'
+    function drawLine(vals, scale, strokeStyle){
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = strokeStyle;
+      vals.forEach((v,i)=>{
+        const y = scale.fn(v);
+        if(y===null)return;
+        const x = (i/(vals.length-1||1))* (w-40) + 20;
+        if(i===0) ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
       });
+      ctx.stroke();
     }
 
-    function drawChart(){
-      const pts = latestData.slice(0,20).reverse();
-      const w = chartCanvas.width = chartCanvas.clientWidth;
-      const h = chartCanvas.height = 260;
+    // CO₂ = بني دافئ
+    drawLine(co2Vals, co2Scale, "var(--brand-main)");
+    // °C = أخضر رايق
+    drawLine(tempVals, tempScale, "var(--ok)");
+    // إجهاد% = بني أغمق
+    drawLine(fVals, fScale, "var(--brand-dark)");
 
-      ctx.clearRect(0,0,w,h);
+    ctx.textAlign = "right";
+    ctx.font = "11px system-ui";
 
-      // خلفية عليها لمسة نعناع
-      ctx.fillStyle = "rgba(223,238,224,0.4)"; /* mint-chip */
-      ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = "var(--brand-main)";
+    ctx.fillText("CO₂", w-10, h-40);
 
-      // خطوط أفقية ناعمة
-      ctx.strokeStyle = "rgba(43,36,26,.07)";
-      ctx.lineWidth = 1;
-      for(let i=1;i<5;i++){
-        const y = (h/5)*i;
-        ctx.beginPath();
-        ctx.moveTo(0,y);
-        ctx.lineTo(w,y);
-        ctx.stroke();
-      }
+    ctx.fillStyle = "var(--ok)";
+    ctx.fillText("°C",  w-10, h-28);
 
-      const co2Vals   = pts.map(p => p.value?.co2 ?? null);
-      const tempVals  = pts.map(p => p.value?.t ?? null);
-      const fVals     = pts.map(p => p.value?.F ?? null);
+    ctx.fillStyle = "var(--brand-dark)";
+    ctx.fillText("إجهاد%", w-10, h-16);
+  }
 
-      function scaleY(arr,minOverride=null,maxOverride=null){
-        const valid = arr.filter(v => v!=null && !isNaN(v));
-        if (!valid.length)
-          return { fn:()=>h/2, min:0, max:1 };
-        let min = (minOverride!=null)?minOverride:Math.min(...valid);
-        let max = (maxOverride!=null)?maxOverride:Math.max(...valid);
-        if (min===max){ max = min+1; }
-        return {
-          min,max,
-          fn:(val)=>{
-            if(val==null||isNaN(val)) return null;
-            const norm = (val - min)/(max-min);
-            return h - norm*h;
-          }
-        };
-      }
-
-      const co2Scale  = scaleY(co2Vals, 400);
-      const tempScale = scaleY(tempVals, 15,35);
-      const fScale    = scaleY(fVals, 0, 100);
-
-      function drawLine(vals, scale, strokeStyle){
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = strokeStyle;
-        vals.forEach((v,i)=>{
-          const y = scale.fn(v);
-          if(y===null)return;
-          const x = (i/(vals.length-1||1))* (w-40) + 20;
-          if(i===0) ctx.moveTo(x,y);
-          else ctx.lineTo(x,y);
-        });
-        ctx.stroke();
-      }
-
-      // CO₂ بخليها لون بني دافئ/ذهبي
-      drawLine(co2Vals, co2Scale, "var(--brand-main)");
-      // °C بخليها أخضر زيتوني هادي
-      drawLine(tempVals, tempScale, "var(--ok)");
-      // F% بخليها بني أغمق
-      drawLine(fVals, fScale, "var(--brand-dark)");
-
-      ctx.textAlign = "right";
-      ctx.font = "11px system-ui";
-      ctx.fillStyle = "var(--brand-main)";
-      ctx.fillText("CO₂", w-10, h-40);
-
-      ctx.fillStyle = "var(--ok)";
-      ctx.fillText("°C",  w-10, h-28);
-
-      ctx.fillStyle = "var(--brand-dark)";
-      ctx.fillText("إجهاد%", w-10, h-16);
+  // -------- جدول آخر القراءات --------
+  function renderTable(){
+    // خذي فقط آخر 10 قراءات فعلية
+    const rows = latestData.slice(0,10);
+    if(!rows.length){
+      readingsBodyEl.innerHTML =
+        '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);">لا توجد بيانات بعد</td></tr>';
+      return;
     }
 
-    function renderTable(){
-      const rows = latestData.slice(0,10);
-      if(!rows.length){
-        readingsBodyEl.innerHTML =
-          '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);">لا توجد بيانات بعد</td></tr>';
-        return;
-      }
+    readingsBodyEl.innerHTML = rows.map(item=>{
+      const tsMs = item.ts || item.ts_ms || null; // نحاول ناخذ timestamp
+      const timeStr = fmtFullTimeFromTS(tsMs);
 
-      readingsBodyEl.innerHTML = rows.map(item=>{
-        const v = item.value || {};
-        const ts   = v.ts;
-        const timeStr = fmtFullTimeFromTS(ts);
+      const Fpct = (item.F != null && !isNaN(item.F)) ? (item.F + "%") : "—";
+      const presence = item.presence === 1 ? "1" : "0";
+      const co2 = (item.co2 != null && !isNaN(item.co2)) ? item.co2 : "—";
+      const t   = (item.t   != null && !isNaN(item.t))   ? item.t.toFixed(1) : "—";
+      const bpm = (item.bpm != null && !isNaN(item.bpm)) ? item.bpm.toFixed(1) : "—";
+      const dist= (item.dist!= null && !isNaN(item.dist))? (item.dist.toFixed(0)+"cm"):"—";
 
-        const F = (v.F != null && !isNaN(v.F)) ? `${v.F}%` : "—";
-        const presence = v.presence === 1 ? "1" : "0";
-        const co2 = (v.co2 != null && !isNaN(v.co2)) ? v.co2 : "—";
-        const t   = (v.t   != null && !isNaN(v.t))   ? v.t.toFixed(1) : "—";
-        const bpm = (v.bpm != null && !isNaN(v.bpm)) ? v.bpm.toFixed(1) : "—";
-        const dist= (v.dist!= null && !isNaN(v.dist))? `${v.dist.toFixed(0)}cm`:"—";
+      return `
+        <tr>
+          <td>${timeStr}</td>
+          <td>${deviceName}</td>
+          <td>${Fpct}</td>
+          <td>${presence}</td>
+          <td>${co2}</td>
+          <td>${t}</td>
+          <td>${bpm}</td>
+          <td>${dist}</td>
+        </tr>
+      `;
+    }).join("");
+  }
 
-        return `
-          <tr>
-            <td>${timeStr}</td>
-            <td>${deviceName}</td>
-            <td>${F}</td>
-            <td>${presence}</td>
-            <td>${co2}</td>
-            <td>${t}</td>
-            <td>${bpm}</td>
-            <td>${dist}</td>
-          </tr>
-        `;
-      }).join("");
+  // -------- البطاقات الجانبية (يمين) --------
+  function renderSessionOverview(){
+    if(!latestData.length) return;
+    const latest = latestData[0];
+
+    // آخر تحديث
+    lastUpdatedEl.textContent = "آخر تحديث: " + fmtFullTimeFromTS(latest.ts || latest.ts_ms);
+
+    // وجود
+    const presTxt = (latest.presence === 1) ? "موجود" : "مو موجود";
+    presenceValEl.textContent = (latest.presence === 1) ? "1" : "0";
+    presenceBadgeEl.textContent = presTxt;
+    presenceBadgeEl.style.background =
+      (latest.presence === 1)
+        ? "rgba(91,127,74,.15)"   // أخضر شفاف
+        : "rgba(194,165,125,.18)"; // بيج خفيف
+    presenceBadgeEl.style.color =
+      (latest.presence === 1)
+        ? "var(--ok)"
+        : "var(--text-main)";
+
+    // CO₂
+    const {label:co2Label,color:co2Color} = co2Status(latest.co2);
+    co2ValEl.textContent = (latest.co2!=null && !isNaN(latest.co2)) ? latest.co2 : "—";
+    co2QualityEl.textContent = co2Label;
+    co2QualityEl.style.color = co2Color;
+
+    // حرارة
+    const {label:tempLabel,color:tempColor} = tempStatus(latest.t);
+    tempValEl.textContent = (latest.t!=null && !isNaN(latest.t)) ? latest.t.toFixed(1) : "—";
+    tempComfortEl.textContent = tempLabel;
+    tempComfortEl.style.color = tempColor;
+
+    // إجهاد
+    let Fpct = latest.F != null && !isNaN(latest.F) ? Number(latest.F) : 0;
+    if(Fpct<0) Fpct=0;
+    if(Fpct>100) Fpct=100;
+
+    fatigueNumEl.textContent = Fpct.toFixed(0) + "%";
+
+    const circleLen = 314;
+    const off = circleLen - (circleLen * (Fpct/100));
+    fatigueRingEl.setAttribute("stroke-dashoffset", off.toString());
+    fatigueRingEl.setAttribute("stroke", fatigueColor(Fpct));
+
+    if(Fpct >= 100){
+      fatigueHintEl.textContent = "جسمك خلص. خذ استراحة حقيقية 🙏";
+    } else if(Fpct >= 70){
+      fatigueHintEl.textContent = "قربت توصل حدك. بريك قصير الآن ✋";
+    } else {
+      fatigueHintEl.textContent = "وضعك آمن 👌";
     }
 
-    function renderSessionOverview(){
-      if(!latestData.length) return;
-      const latest = latestData[0].value || {};
+    // تحديث اسم الجهاز المعروض فوق الرسم و فوق الجدول
+    chartDeviceNameEl.textContent = deviceName;
+    tableMetaEl.textContent = deviceName;
+  }
 
-      lastUpdatedEl.textContent = "آخر تحديث: " + fmtFullTimeFromTS(latest.ts);
+  // -------- جلب البيانات من الباكإند --------
+  async function fetchLatest(){
+    // مهم: ما عاد نقرأ /api/devices ، عندنا اسم ثابت
+    // deviceName = "GAIDESK-01";
 
-      // الوجود
-      const presTxt = latest.presence === 1 ? "موجود" : "مو موجود";
-      presenceValEl.textContent = latest.presence === 1 ? "1" : "0";
-      presenceBadgeEl.textContent = presTxt;
-      presenceBadgeEl.style.background =
-        latest.presence === 1
-          ? "rgba(91,127,74,.15)" // var(--ok) لكن شفاف
-          : "rgba(194,165,125,.18)";
-      presenceBadgeEl.style.color =
-        latest.presence === 1
-          ? "var(--ok)"
-          : "var(--text-main)";
+    try {
+      const res = await fetch('/api/data?limit=50&device=' + encodeURIComponent(deviceName));
+      const arr = await res.json();
 
-      // CO₂
-      const co2ppm = latest.co2;
-      co2ValEl.textContent = (co2ppm!=null && !isNaN(co2ppm)) ? co2ppm : "—";
-      const {label:co2Label,color:co2Color} = co2Status(co2ppm);
-      co2QualityEl.textContent = co2Label;
-      co2QualityEl.style.color = co2Color;
-
-      // حرارة
-      const tempC = latest.t;
-      tempValEl.textContent = (tempC!=null && !isNaN(tempC)) ? tempC.toFixed(1) : "—";
-      const {label:tempLabel,color:tempColor} = tempStatus(tempC);
-      tempComfortEl.textContent = tempLabel;
-      tempComfortEl.style.color = tempColor;
-
-      // إجهاد
-      let Fpct = latest.F != null && !isNaN(latest.F) ? Number(latest.F) : 0;
-      if(Fpct<0) Fpct=0;
-      if(Fpct>100) Fpct=100;
-
-      fatigueNumEl.textContent = Fpct.toFixed(0) + "%";
-      const circleLen = 314;
-      const off = circleLen - (circleLen * (Fpct/100));
-      fatigueRingEl.setAttribute("stroke-dashoffset", off.toString());
-      fatigueRingEl.setAttribute("stroke", fatigueColor(Fpct));
-
-      if(Fpct >= 100){
-        fatigueHintEl.textContent = "جسمك خلص. خذ استراحة حقيقية 🙏";
-      } else if(Fpct >= 70){
-        fatigueHintEl.textContent = "قربت توصل حدك. بريك قصير الآن ✋";
-      } else {
-        fatigueHintEl.textContent = "وضعك آمن 👌";
+      // نتوقع الآن شكل أسهل:
+      // [
+      //   { key:"...", value:{co2:..., t:..., F:..., ts:..., ... } },
+      //   ...
+      // ]
+      //
+      // بنحوّلها إلى شكل فلات {co2,t,F,ts,...} عشان الرسم والجدول ما يتلخبط
+      if(Array.isArray(arr)){
+        latestData = arr
+          .map(row => {
+            // لو الـAPI رجّع {key, value:{...}}
+            if (row && row.value && typeof row.value === "object") {
+              const v = row.value;
+              return {
+                ts   : v.ts,
+                ts_ms: v.ts, // نخزنه برضه بنفس المفتاح الاحتياط
+                co2  : v.co2,
+                t    : v.t,
+                F    : v.F,
+                bpm  : v.bpm,
+                dist : v.dist,
+                presence: v.presence
+              };
+            }
+            // fallback: يمكن الـAPI أصلاً رجع القراءات مباشرة بدون .value
+            return row;
+          })
+          // شيل أي عنصر فاضي مره
+          .filter(x => x && (x.ts || x.ts_ms));
       }
-
-      chartDeviceNameEl.textContent = deviceName;
-      tableMetaEl.textContent = deviceName;
+    } catch (err){
+      console.warn("fetch /api/data fail", err);
     }
 
-    async function fetchLatest(){
-      try {
-        const devRes = await fetch('/api/devices');
-        const devices = await devRes.json();
-        if (Array.isArray(devices) && devices.length > 0){
-          deviceName = devices[0];
-        }
-      } catch (err){
-        console.warn("devices fetch fail", err);
-      }
+    renderSessionOverview();
+    renderTable();
+    drawChart();
+  }
 
-      try {
-        const dataRes = await fetch('/api/data?limit=50&device='+encodeURIComponent(deviceName));
-        const arr = await dataRes.json();
-        if(Array.isArray(arr)){
-          latestData = arr;
-        }
-      } catch (err){
-        console.warn("data fetch fail", err);
-      }
+  // أول تحميل
+  fetchLatest();
 
-      renderSessionOverview();
-      renderTable();
-      drawChart();
+  // تحديث كل 5 ثواني لو الزر شغال
+  setInterval(()=>{
+    if(autoRefresh){
+      fetchLatest();
     }
+  }, 5000);
+</script>
 
-    fetchLatest();
-    setInterval(()=>{
-      if(autoRefresh){
-        fetchLatest();
-      }
-    }, 5000);
-  </script>
 </body>
 </html>
