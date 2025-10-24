@@ -1,494 +1,918 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>{{ title or "لوحة GAIDESK" }}</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GAIDESK • لوحة صحتك الحية</title>
 
-    <!-- Tailwind CDN (خفيف وسريع للتصميم) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      /* ألوان الهوية من الصورة */
+      --brand-main: #8a6a44;      /* البني الدافئ (اللوقو) */
+      --brand-dark: #5a442b;      /* أغمق شوي */
+      --brand-soft: #c2a57d;      /* بيج/ذهبي دافئ */
 
-    <!-- ننظف ألوان Tailwind شوي -->
-    <style>
-        body {
-            background-color: #f8fafc; /* slate-50 */
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-        }
+      --mint-bg: #eef8ef;         /* أخضر فاتح شفاااف للخلفيات الكبيرة */
+      --mint-chip: #dfeee0;       /* أخضر باهت للعناصر المريحة */
+      --mint-mid: #cde0cd;        /* أغمق شوية لو نحتاج تباين */
 
-        /* دائرة الإجهاد */
-        .fatigue-ring {
-            width: 8rem;
-            height: 8rem;
-            border-radius: 9999px;
-            border-width: 10px;
-            border-style: solid;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1.5rem;
-            color: #1e293b; /* slate-800 */
-            background-color: white;
-        }
+      --surface-card: #ffffff;    /* لون كروت */
+      --text-main: #2b241a;       /* نص داكن متقارب مع البني الغامق */
+      --text-dim: #6e655a;        /* نص ثانوي فاتح لكن دافئ مو رمادي بارد */
 
-        /* مربعات المقاييس */
-        .metric-card {
-            background-color: white;
-            border-radius: 0.75rem;
-            border: 1px solid #e2e8f0; /* slate-200 */
-            min-width: 8rem;
-            padding: 1rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
-            display: flex;
-            flex-direction: column;
-            gap: .5rem;
-        }
+      --ok: #5b7f4a;              /* مريح/جيد (أخضر مستوحى من الباستيل بس أغمق للوضوح) */
+      --warn: #c29a4a;            /* تحذير دافئ ذهبي */
+      --bad: #9a3a2a;             /* سيء/مرهق (بني-محمر بدل أحمر نيون) */
 
-        .metric-label {
-            font-size: .9rem;
-            font-weight: 600;
-            color: #475569; /* slate-600 */
-            text-align: center;
-        }
+      --radius-lg: 1rem;
+      --radius-md: .75rem;
+      --radius-sm: .5rem;
 
-        .metric-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            text-align: center;
-            color: #0f172a; /* slate-900 */
-            min-height: 1.5rem;
-        }
+      --shadow-card: 0 24px 40px rgba(43, 36, 26, 0.07);
+      --shadow-inner: inset 0 0 0 1px rgba(43,36,26,0.06);
+    }
 
-        .metric-note {
-            font-size: .7rem;
-            color: #94a3b8; /* slate-400 */
-            text-align: center;
-        }
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+    }
 
-        /* كرت الرسم / آخر القراءات */
-        .panel {
-            background-color: white;
-            border-radius: .75rem;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
-        }
+    body {
+      margin: 0;
+      background-color: var(--mint-bg); /* خلفية مائلة للنعناع الهادئ */
+      color: var(--text-main);
+      line-height: 1.5;
+    }
 
-        /* جدول */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: .8rem;
-        }
-        th {
-            background-color: #f1f5f9; /* slate-100 */
-            color: #475569;
-            text-align: right;
-            white-space: nowrap;
-            font-weight: 600;
-            font-size: .75rem;
-            border-bottom: 1px solid #e2e8f0;
-            padding: .5rem .75rem;
-        }
-        td {
-            border-bottom: 1px solid #e2e8f0;
-            padding: .5rem .75rem;
-            color: #0f172a;
-            vertical-align: top;
-        }
+    /* ====== NAVBAR ====== */
+    header.navbar {
+      background: var(--surface-card);
+      box-shadow: 0 10px 30px rgba(43,36,26,.07);
+      border-bottom: 1px solid rgba(43,36,26,.05);
+      padding: .75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-        /* سويتش التحديث التلقائي */
-        .toggle-track {
-            width: 2.25rem;
-            height: 1.25rem;
-            border-radius: 9999px;
-            background-color: #0ea5e9; /* sky-500 */
-            position: relative;
-            cursor: pointer;
-        }
-        .toggle-knob {
-            width: 1rem;
-            height: 1rem;
-            border-radius: 9999px;
-            background-color: white;
-            position: absolute;
-            top: .125rem;
-            right: .125rem;
-            transition: all .15s;
-        }
-        .toggle-off .toggle-track {
-            background-color: #cbd5e1; /* slate-300 */
-        }
-        .toggle-off .toggle-knob {
-            right: calc(100% - 1.125rem);
-        }
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: .5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--brand-main);
+    }
+    .brand .dot {
+      width: .6rem;
+      height: .6rem;
+      border-radius: 999px;
+      background: var(--brand-main);
+      box-shadow: 0 0 10px rgba(138,106,68,.4);
+    }
+    .brand-tagline {
+      color: var(--text-dim);
+      font-weight: 400;
+      font-size: .8rem;
+      line-height: 1.2;
+    }
 
-    </style>
+    nav.nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      font-size: .9rem;
+      color: var(--text-main);
+    }
+    nav.nav-links a {
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 500;
+      line-height: 1.2;
+      padding: .4rem .6rem;
+      border-radius: var(--radius-sm);
+      background: rgba(194,165,125,0); /* شفاف */
+      transition: all .15s linear;
+    }
+    nav.nav-links a:hover {
+      background: rgba(194,165,125,0.12); /* لمسة بيج دافئ */
+      color: var(--brand-main);
+    }
+
+    .auto-refresh {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .8rem;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+    .toggle-wrap {
+      position: relative;
+      width: 38px;
+      height: 20px;
+      background-color: rgba(194,165,125,.4); /* بيج فاتح */
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all .15s linear;
+      box-shadow: 0 4px 10px rgba(43,36,26,.15) inset;
+    }
+    .toggle-wrap.active {
+      background-color: var(--brand-main);
+      box-shadow: 0 4px 10px rgba(43,36,26,.3) inset;
+    }
+    .toggle-dot {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 999px;
+      box-shadow: 0 4px 10px rgba(43,36,26,.3);
+      transition: all .15s linear;
+    }
+    .toggle-wrap.active .toggle-dot {
+      right: 20px;
+    }
+
+    /* ====== PAGE GRID ====== */
+    .page {
+      max-width: 1280px;
+      margin: 2rem auto 4rem auto;
+      padding: 0 1rem 4rem 1rem;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media(min-width: 1024px) {
+      .page {
+        grid-template-columns: 1fr 320px;
+        align-items: start;
+      }
+    }
+
+    /* ====== RIGHT SIDEBAR (SESSION OVERVIEW) ====== */
+    .session-card {
+      background: var(--surface-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 1rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      border: 1px solid rgba(43,36,26,.05);
+    }
+
+    .section-title {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .last-updated {
+      font-size: .7rem;
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+      gap: .75rem;
+    }
+
+    .mini-card {
+      background: var(--mint-bg); /* نعناع باهت مو أبيض */
+      border-radius: var(--radius-md);
+      padding: .75rem .8rem;
+      box-shadow: var(--shadow-inner);
+      border: 1px solid rgba(43,36,26,.05);
+      display: flex;
+      flex-direction: column;
+      min-height: 90px;
+    }
+
+    .mini-label {
+      font-size: .7rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+    }
+
+    .mini-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-top: .5rem;
+      line-height: 1.2;
+    }
+
+    .mini-hint {
+      font-size: .7rem;
+      font-weight: 400;
+      color: var(--text-dim);
+      line-height: 1.4;
+      margin-top: .25rem;
+    }
+
+    /* ====== FATIGUE GAUGE ====== */
+    .fatigue-box {
+      background: var(--mint-bg);
+      border-radius: var(--radius-md);
+      padding: 1rem .8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: var(--shadow-inner);
+      border: 1px solid rgba(43,36,26,.05);
+    }
+
+    .fatigue-title {
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      margin-bottom: .5rem;
+    }
+
+    .fatigue-circle-wrapper {
+      width: 120px;
+      height: 120px;
+      position: relative;
+    }
+
+    .fatigue-ring-bg,
+    .fatigue-ring-val {
+      fill: none;
+      stroke-width: 10;
+      transform-origin: center;
+      transform: rotate(-90deg);
+      stroke-linecap: round;
+    }
+
+    .fatigue-val-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      color: var(--text-main);
+    }
+    .fatigue-val-text .num {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+    .fatigue-val-text .pct-label {
+      font-size: .7rem;
+      color: var(--text-dim);
+      font-weight: 500;
+      margin-top: .25rem;
+    }
+
+    .fatigue-hint {
+      font-size: .7rem;
+      color: var(--text-dim);
+      line-height: 1.4;
+      margin-top: .5rem;
+    }
+
+    /* ====== LEFT MAIN COLUMN ====== */
+    .main-col {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .chart-card,
+    .table-card,
+    .about-card {
+      background: var(--surface-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 1rem 1.25rem 1.25rem 1.25rem;
+      border: 1px solid rgba(43,36,26,.05);
+    }
+
+    .chart-header,
+    .table-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: .5rem;
+      margin-bottom: .75rem;
+    }
+
+    .chart-title,
+    .table-title,
+    .about-title {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .chart-meta,
+    .table-meta {
+      font-size: .7rem;
+      color: var(--text-dim);
+    }
+
+    canvas {
+      width: 100%;
+      max-height: 260px;
+    }
+
+    table.readings-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+    table.readings-table th {
+      text-align: right;
+      font-size: .7rem;
+      color: var(--text-dim);
+      font-weight: 500;
+      padding: .5rem .5rem;
+      border-bottom: 1px solid rgba(43,36,26,.08);
+      white-space: nowrap;
+      background: rgba(194,165,125,.07); /* صف العناوين لمسة بيج خفيفة */
+    }
+    table.readings-table td {
+      font-size: .8rem;
+      color: var(--text-main);
+      padding: .6rem .5rem;
+      border-bottom: 1px solid rgba(43,36,26,.05);
+      vertical-align: top;
+      line-height: 1.4;
+    }
+
+    .about-desc {
+      font-size: .8rem;
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+    .about-desc small {
+      display: block;
+      color: var(--text-dim);
+      font-size: .7rem;
+      margin-top: .75rem;
+      line-height: 1.6;
+    }
+
+    /* ====== FOOTER ====== */
+    footer.site-footer {
+      background: var(--surface-card);
+      border-top: 1px solid rgba(43,36,26,.07);
+      box-shadow: 0 -16px 32px rgba(43,36,26,.07);
+      padding: 1rem;
+      text-align: center;
+      font-size: .7rem;
+      line-height: 1.6;
+      color: var(--text-dim);
+    }
+    .footer-brand {
+      font-weight: 600;
+      color: var(--brand-main);
+    }
+    .footer-links {
+      margin-top: .5rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: var(--brand-main);
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .footer-links a svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--brand-main);
+    }
+
+  </style>
 </head>
+<body>
 
-<body class="text-slate-900">
+  <!-- ====== NAVBAR ====== -->
+  <header class="navbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>GAIDESK</span>
+      <span class="brand-tagline">مساعد صحتك أثناء التركيز العميق</span>
+    </div>
 
-    <!-- Nav / Header -->
-    <header class="w-full bg-white border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4 py-4 px-4 sm:px-6 lg:px-8">
+    <nav class="nav-links">
+      <a href="#dashboard">لوحة المراقبة</a>
+      <a href="#about">عن GAIDESK</a>
 
-            <!-- عنوان -->
-            <div class="flex flex-col">
-                <div class="text-sky-600 font-bold tracking-tight text-lg">
-                    GAIDESK
-                </div>
-                <div class="text-[.8rem] text-slate-500">
-                    لوحة عرض بيانات Firebase (من خلال السيرفر)
-                </div>
-            </div>
-
-            <!-- يمين: تحديث تلقائي / زر تحديث يدوي -->
-            <div class="flex items-center gap-4">
-
-                <!-- سويتش تحديث تلقائي -->
-                <label class="flex items-center gap-2 text-[.8rem] text-slate-600 cursor-pointer select-none" id="auto-refresh-wrapper">
-                    <span>تحديث تلقائي</span>
-                    <div id="auto-refresh-toggle" class="relative toggle-track">
-                        <div class="toggle-knob"></div>
-                    </div>
-                </label>
-
-                <!-- زر تحديث يدوي -->
-                <button id="manual-refresh-btn"
-                    class="text-[.8rem] bg-slate-800 text-white font-semibold rounded-md px-3 py-2 hover:bg-slate-900 active:scale-[.98] transition">
-                    تحديث الآن
-                </button>
-
-            </div>
+      <div class="auto-refresh">
+        <span>تحديث تلقائي</span>
+        <div id="refreshToggle" class="toggle-wrap active">
+          <div class="toggle-dot"></div>
         </div>
-    </header>
+      </div>
+    </nav>
+  </header>
 
+  <main class="page" id="dashboard">
 
-    <!-- المحتوى الرئيسي -->
-    <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col gap-6">
+    <!-- LEFT MAIN COLUMN -->
+    <section class="main-col">
 
-        <!-- صف البطاقات العلوية -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- CHART / LIVE TREND -->
+      <section class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title">
+            <span>الرسم البياني المباشر</span>
+            <span style="color:var(--text-dim);font-size:.7rem;font-weight:400">
+              CO₂ / الحرارة / الإجهاد
+            </span>
+          </div>
+          <div class="chart-meta" id="chartDeviceName">—</div>
+        </div>
 
-            <!-- وجود -->
-            <div class="metric-card">
-                <div class="metric-label">وجود</div>
-                <div id="card-presence-value" class="metric-value">—</div>
-                <div id="card-presence-note" class="metric-note">موجود = 1 | لا يوجد = 0</div>
-            </div>
+        <canvas id="chartCanvas"></canvas>
+      </section>
 
-            <!-- آخر CO₂ -->
-            <div class="metric-card">
-                <div class="metric-label">آخر CO₂</div>
-                <div id="card-co2-value" class="metric-value">—</div>
-                <div class="metric-note">ppm</div>
-            </div>
+      <!-- TABLE: LAST READINGS -->
+      <section class="table-card">
+        <div class="table-header">
+          <div class="table-title">آخر القراءات</div>
+          <div class="table-meta" id="tableMeta">GAIDESK-01</div>
+        </div>
 
-            <!-- آخر حرارة -->
-            <div class="metric-card">
-                <div class="metric-label">آخر حرارة</div>
-                <div id="card-temp-value" class="metric-value">—</div>
-                <div class="metric-note">°C</div>
-            </div>
+        <div style="overflow-x:auto;">
+          <table class="readings-table" id="readingsTable">
+            <thead>
+              <tr>
+                <th>الوقت</th>
+                <th>الجهاز</th>
+                <th>الإجهاد %</th>
+                <th>وجود</th>
+                <th>CO₂</th>
+                <th>°C</th>
+                <th>بالم</th>
+                <th>المسافة</th>
+              </tr>
+            </thead>
+            <tbody id="readingsBody">
+              <tr>
+                <td colspan="8" style="text-align:center;color:var(--text-dim);">
+                  لا توجد بيانات بعد
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-            <!-- إجهاد الجلسة -->
-            <div class="metric-card flex flex-col sm:flex-row lg:flex-col items-center sm:items-start lg:items-center gap-3">
-                <div class="flex flex-col gap-1 text-center sm:text-right lg:text-center">
-                    <div class="metric-label">إجهاد الجلسة</div>
-                    <div class="text-[.7rem] text-slate-500 leading-tight">
-                        • تنبيه عند 70٪ <br/>
-                        • استراحة عند 100٪
-                    </div>
-                </div>
+      <!-- ABOUT / VALUE PROP -->
+      <section class="about-card" id="about">
+        <div class="chart-header" style="margin-bottom:.5rem">
+          <div class="about-title">
+            <span>ليش GAIDESK؟</span>
+          </div>
+        </div>
 
-                <div class="fatigue-ring border-slate-200" id="fatigue-ring">
-                    <span id="fatigue-percent">0%</span>
-                </div>
-            </div>
+        <div class="about-desc">
+          GAIDESK يتابع جسمك أثناء الشغل أو المذاكرة:
+          وضع الجلوس، قربك من الشاشة، تنفسك، نبضك، جودة الهواء حوالينك.
+          يعطيك تنبيه مو حسب تايمر عشوائي… لكن حسب إجهاد جسمك الحقيقي.
+          <small>
+            مفيد جدًا للي يدخلون في Hyperfocus (مبرمجين، طلاب، ADHD)
+            وينسون جسمهم تمامًا.  
+            لو CO₂ عالي → يقولك افتح تهوية.  
+            لو جلستك غلط/قريب جدًا → ينبه فورًا.  
+            لو إجهادك وصل 100% → يوقفك بريك إجباري.
+          </small>
+        </div>
+      </section>
 
-        </section>
+    </section>
 
+    <!-- RIGHT SIDEBAR: SESSION OVERVIEW -->
+    <aside class="session-card">
 
-        <!-- قسم الرسم البياني + آخر تحديث -->
-        <section class="panel p-4 flex flex-col gap-4">
+      <div class="section-title">
+        <span>جلستي الحالية</span>
+        <span class="last-updated" id="lastUpdated">—</span>
+      </div>
 
-            <!-- آخر تحديث -->
-            <div class="flex flex-wrap items-center gap-2 text-[.8rem]">
-                <span class="bg-slate-100 text-slate-700 rounded-md px-2 py-1 font-medium">
-                    <span id="last-update-text">آخر تحديث: —</span>
-                </span>
+      <!-- STATUS CARDS -->
+      <div class="stats-grid">
+        <!-- PRESENCE -->
+        <div class="mini-card">
+          <div class="mini-label">
+            <span>وجود</span>
+            <span id="presenceBadge"
+              style="
+                font-size:.7rem;
+                font-weight:600;
+                color:var(--text-main);
+                background:rgba(194,165,125,.18);
+                padding:.15rem .4rem;
+                border-radius:.4rem;">
+              —
+            </span>
+          </div>
+          <div class="mini-value" id="presenceVal">—</div>
+          <div class="mini-hint">موجود = 1 / غير موجود = 0</div>
+        </div>
 
-                <span class="text-[.7rem] text-slate-400">
-                    (GAIDESK-01)
-                </span>
-            </div>
+        <!-- AIR QUALITY -->
+        <div class="mini-card">
+          <div class="mini-label">
+            <span>الهواء</span>
+            <span id="co2Quality"
+              style="font-size:.7rem;font-weight:600;">
+              —
+            </span>
+          </div>
+          <div class="mini-value">
+            <span id="co2Val">—</span>
+            <span style="font-size:.8rem;color:var(--text-dim);font-weight:400;">ppm</span>
+          </div>
+          <div class="mini-hint">CO₂ العالي = صداع وتشتيت</div>
+        </div>
 
-            <!-- عنوان الرسم -->
-            <div>
-                <div class="text-slate-800 font-semibold">
-                    الرسم البياني
-                </div>
-                <div class="text-[.8rem] text-slate-500">
-                    حرارة (أزرق) + CO₂ (وردي)
-                </div>
-            </div>
+        <!-- TEMP / COMFORT -->
+        <div class="mini-card">
+          <div class="mini-label">
+            <span>حرارة الغرفة</span>
+            <span id="tempComfort"
+              style="font-size:.7rem;font-weight:600;">
+              —
+            </span>
+          </div>
+          <div class="mini-value">
+            <span id="tempVal">—</span>
+            <span style="font-size:.8rem;color:var(--text-dim);font-weight:400;">°C</span>
+          </div>
+          <div class="mini-hint">مريحة = تركيز أفضل</div>
+        </div>
+      </div>
 
-            <!-- Placeholder رسم بياني -->
-            <div class="w-full overflow-x-auto">
-                <div class="w-full min-w-[300px] h-[200px] flex items-center justify-center border border-dashed border-slate-300 text-slate-400 text-[.8rem] rounded-md bg-slate-50">
-                    <div class="text-center leading-relaxed">
-                        هنا الرسم البياني اللحظي / التاريخي<br/>
-                        (يستخدم /api/data و Chart.js)
-                    </div>
-                </div>
-            </div>
+      <!-- FATIGUE GAUGE -->
+      <div class="fatigue-box">
+        <div class="fatigue-title">إجهاد الجلسة</div>
 
-        </section>
+        <div class="fatigue-circle-wrapper">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <!-- خلفية -->
+            <circle
+              class="fatigue-ring-bg"
+              cx="60" cy="60" r="50"
+              stroke="rgba(43,36,26,.12)"
+            />
+            <!-- القيمة -->
+            <circle
+              id="fatigueRing"
+              class="fatigue-ring-val"
+              cx="60" cy="60" r="50"
+              stroke="var(--ok)"
+              stroke-dasharray="314"
+              stroke-dashoffset="314"
+            />
+          </svg>
+          <div class="fatigue-val-text">
+            <div class="num" id="fatigueNum">0%</div>
+            <div class="pct-label">نسبة التعب</div>
+          </div>
+        </div>
 
+        <div class="fatigue-hint" id="fatigueHint">
+          تنبيه عند 70%، بريك إجباري عند 100%
+        </div>
+      </div>
 
-        <!-- جدول آخر القراءات -->
-        <section class="panel p-4 flex flex-col gap-4">
+    </aside>
 
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div class="text-slate-800 font-semibold text-base">
-                    آخر القراءات
-                </div>
-                <div class="text-[.8rem] text-slate-500">
-                    أحدث بيانات الجلسة الحالية من المستشعر
-                </div>
-            </div>
+  </main>
 
-            <div class="overflow-x-auto border border-slate-200 rounded-md">
-                <table id="readings-table">
-                    <thead>
-                        <tr>
-                            <th>الوقت</th>
-                            <th>الجهاز</th>
-                            <th>C°</th>
-                            <th>CO₂</th>
-                            <th>وجود</th>
-                            <th>إجهاد/خطر</th>
-                        </tr>
-                    </thead>
-                    <tbody id="readings-tbody">
-                        <tr class="text-[.8rem] text-slate-400">
-                            <td colspan="6" class="text-center py-6">
-                                (سيتم التحديث تلقائياً)
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="footer-brand">
+      © <span id="yearNow"></span> GAIDESK
+    </div>
+    <div>صحتك الذكية = شغلك الذكي 🧠💻</div>
 
-        </section>
+    <div class="footer-links">
+      <a href="YOUR_LINKEDIN_URL_HERE" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0
+            2.76 2.24 5 5 5h14c2.76 0
+            5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11
+            19h-3v-10h3v10zm-1.5-11.28c-.96
+            0-1.75-.79-1.75-1.75s.79-1.75
+            1.75-1.75 1.75.79
+            1.75 1.75-.79 1.75-1.75
+            1.75zm13.5 11.28h-3v-5.6c0-1.34-.03-3.07-1.87-3.07-1.87
+            0-2.16 1.46-2.16 2.97v5.7h-3v-10h2.88v1.37h.04c.4-.75
+            1.38-1.54 2.84-1.54 3.04 0
+            3.6 2 3.6 4.59v5.58z"/>
+        </svg>
+        <span>LinkedIn</span>
+      </a>
+    </div>
+  </footer>
 
-    </main>
+  <!-- ====== JS (نفس المنطق السابق) ====== -->
+  <script>
+    const lastUpdatedEl   = document.getElementById('lastUpdated');
+    const presenceBadgeEl = document.getElementById('presenceBadge');
+    const presenceValEl   = document.getElementById('presenceVal');
 
+    const co2ValEl        = document.getElementById('co2Val');
+    const co2QualityEl    = document.getElementById('co2Quality');
 
-    <!-- سكربت من السيرفر: يجلب /api/live باستمرار ويحدث الصفحة -->
-    <script>
-    // إعداد
-    const DEFAULT_DEVICE = "GAIDESK-01";
+    const tempValEl       = document.getElementById('tempVal');
+    const tempComfortEl   = document.getElementById('tempComfort');
 
-    let autoRefreshOn = true; // الحالة الافتراضية للتحديث التلقائي (ON)
-    const autoRefreshToggle = document.getElementById("auto-refresh-toggle");
+    const fatigueNumEl    = document.getElementById('fatigueNum');
+    const fatigueRingEl   = document.getElementById('fatigueRing');
+    const fatigueHintEl   = document.getElementById('fatigueHint');
 
-    // يبدل الستايل تبع السويتش
-    function renderAutoRefreshToggle() {
-        if (autoRefreshOn) {
-            autoRefreshToggle.parentElement.classList.remove("toggle-off");
-        } else {
-            autoRefreshToggle.parentElement.classList.add("toggle-off");
-        }
-    }
+    const readingsBodyEl  = document.getElementById('readingsBody');
+    const chartDeviceNameEl = document.getElementById('chartDeviceName');
+    const tableMetaEl     = document.getElementById('tableMeta');
 
-    // لما اضغط على السويتش
-    document.getElementById("auto-refresh-wrapper").addEventListener("click", () => {
-        autoRefreshOn = !autoRefreshOn;
-        renderAutoRefreshToggle();
+    const refreshToggleEl = document.getElementById('refreshToggle');
+    const yearNowEl       = document.getElementById('yearNow');
+    yearNowEl.textContent = new Date().getFullYear().toString();
+
+    const chartCanvas = document.getElementById('chartCanvas');
+    const ctx = chartCanvas.getContext('2d');
+
+    let autoRefresh = true;
+    refreshToggleEl.addEventListener('click', () => {
+      autoRefresh = !autoRefresh;
+      refreshToggleEl.classList.toggle('active', autoRefresh);
     });
 
-    // زر تحديث يدوي
-    document.getElementById("manual-refresh-btn").addEventListener("click", () => {
-        updateAll();
-    });
+    let latestData = [];
+    let deviceName = "GAIDESK-01";
 
-    // فورمات مساعد
-    function fmt(v, unit="") {
-        if (v === null || v === undefined || Number.isNaN(v)) return "—";
-        if (typeof v === "number") {
-            if (unit === "°C") return v.toFixed(1);
-            return v.toString();
-        }
-        return v;
+    function co2Status(ppm){
+      if (ppm == null || isNaN(ppm))
+        return {label:"—", color:"var(--text-dim)"};
+      if (ppm < 800)
+        return {label:"ممتاز", color:"var(--ok)"};
+      if (ppm < 1200)
+        return {label:"مقبول", color:"var(--warn)"};
+      if (ppm < 2000)
+        return {label:"سيّء", color:"var(--bad)"};
+      return {label:"خطر", color:"var(--bad)"};
     }
 
-    // جلب آخر قراءة مباشرة من السيرفر
-    // السيرفر -> /api/live -> يسحب من /data/<device>/latest في Firebase
-    async function fetchLive() {
-        const url = `/api/live?device=${encodeURIComponent(DEFAULT_DEVICE)}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("fetchLive failed " + res.status);
-        const json = await res.json();
-        // structure: { device: "...", data: {...} }
-        return json.data || {};
+    function tempStatus(c){
+      if (c == null || isNaN(c))
+        return {label:"—", color:"var(--text-dim)"};
+      if (c >= 20 && c <= 26)
+        return {label:"مريح", color:"var(--ok)"};
+      return {label:"غير مريح", color:"var(--warn)"};
     }
 
-    // تحديث الكروت العلوية (presence / co2 / temp / F / آخر تحديث)
-    function updateCardsFromLive(live) {
-        // presence
-        const presEl   = document.getElementById("card-presence-value");
-        const presNote = document.getElementById("card-presence-note");
-        if (presEl) {
-            if (live.presence === 1) {
-                presEl.textContent = "موجود";
-            } else if (live.presence === 0) {
-                presEl.textContent = "لا يوجد";
-            } else {
-                presEl.textContent = "—";
-            }
-        }
-        if (presNote) {
-            presNote.textContent = "موجود = 1 | لا يوجد = 0";
-        }
-
-        // CO2
-        const co2Val = document.getElementById("card-co2-value");
-        if (co2Val) {
-            co2Val.textContent = fmt(live.co2);
-        }
-
-        // حرارة
-        const tempVal = document.getElementById("card-temp-value");
-        if (tempVal) {
-            tempVal.textContent = fmt(live.t, "°C");
-        }
-
-        // إجهاد الجلسة (F)
-        const fatigueRing    = document.getElementById("fatigue-ring");
-        const fatiguePercent = document.getElementById("fatigue-percent");
-        if (fatiguePercent && fatigueRing) {
-            let f = (typeof live.F === "number") ? Math.round(live.F) : 0;
-            if (f < 0)   f = 0;
-            if (f > 100) f = 100;
-
-            fatiguePercent.textContent = f + "%";
-
-            // لو حابة نلوّن حسب الخطورة:
-            // <70 = أخضر / 70-99 = أصفر / 100 = أحمر
-            let ringColor = "#22c55e"; // green-500
-            let borderCol = "#86efac"; // green-200
-            if (f >= 70 && f < 100) {
-                ringColor = "#eab308"; // yellow-500
-                borderCol = "#fde047"; // yellow-300
-            } else if (f >= 100) {
-                ringColor = "#ef4444"; // red-500
-                borderCol = "#fecaca"; // red-200
-            }
-            fatigueRing.style.color = ringColor;
-            fatigueRing.style.borderColor = borderCol;
-        }
-
-        // آخر تحديث
-        const lastUpEl = document.getElementById("last-update-text");
-        if (lastUpEl) {
-            if (live.ts) {
-                // live.ts من ESP32 يرسل ts[".sv"]="timestamp" للفايربيس
-                // في الريل تايم DB يتخزن كـ رقم ms
-                // السيرفر رجعه زي ما هو في json.data.ts
-                const dt = new Date(live.ts);
-                lastUpEl.textContent = "آخر تحديث: " + dt.toLocaleString('ar-SA');
-            } else {
-                lastUpEl.textContent = "آخر تحديث: —";
-            }
-        }
+    function fatigueColor(pct){
+      if (pct >= 100) return "var(--bad)";
+      if (pct >= 70)  return "var(--warn)";
+      return "var(--ok)";
     }
 
-    // تحديث الجدول تحت "آخر القراءات"
-    // حالياً بناخذ قراءة "live" نفسها ونحطها كسطر أول
-    // (لين نركب التاريخي)
-    function updateTableFromLive(live) {
-        const tbody = document.getElementById("readings-tbody");
-        if (!tbody) return;
+    function fmtFullTimeFromTS(ts){
+      if (!ts) return "—";
+      const d = new Date(ts);
+      return d.toLocaleString('ar-SA', {
+        year: 'numeric', month:'short', day:'numeric',
+        hour:'2-digit', minute:'2-digit'
+      });
+    }
 
-        // حضّر أشياء
-        const now = live.ts ? new Date(live.ts) : new Date();
-        const timeStr = now.toLocaleString('ar-SA');
+    function drawChart(){
+      const pts = latestData.slice(0,20).reverse();
+      const w = chartCanvas.width = chartCanvas.clientWidth;
+      const h = chartCanvas.height = 260;
 
-        const devName = DEFAULT_DEVICE;
+      ctx.clearRect(0,0,w,h);
 
-        const tempStr = (live.t !== undefined && live.t !== null)
-            ? fmt(live.t,"°C")
-            : "—";
+      // خلفية عليها لمسة نعناع
+      ctx.fillStyle = "rgba(223,238,224,0.4)"; /* mint-chip */
+      ctx.fillRect(0,0,w,h);
 
-        const co2Str = (live.co2 !== undefined && live.co2 !== null)
-            ? fmt(live.co2)
-            : "—";
+      // خطوط أفقية ناعمة
+      ctx.strokeStyle = "rgba(43,36,26,.07)";
+      ctx.lineWidth = 1;
+      for(let i=1;i<5;i++){
+        const y = (h/5)*i;
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(w,y);
+        ctx.stroke();
+      }
 
-        const presenceStr = (live.presence === 1)
-            ? "1"
-            : (live.presence === 0 ? "0" : "—");
+      const co2Vals   = pts.map(p => p.value?.co2 ?? null);
+      const tempVals  = pts.map(p => p.value?.t ?? null);
+      const fVals     = pts.map(p => p.value?.F ?? null);
 
-        const fatigueStr = (typeof live.F === "number")
-            ? Math.round(live.F) + "%"
-            : "—";
+      function scaleY(arr,minOverride=null,maxOverride=null){
+        const valid = arr.filter(v => v!=null && !isNaN(v));
+        if (!valid.length)
+          return { fn:()=>h/2, min:0, max:1 };
+        let min = (minOverride!=null)?minOverride:Math.min(...valid);
+        let max = (maxOverride!=null)?maxOverride:Math.max(...valid);
+        if (min===max){ max = min+1; }
+        return {
+          min,max,
+          fn:(val)=>{
+            if(val==null||isNaN(val)) return null;
+            const norm = (val - min)/(max-min);
+            return h - norm*h;
+          }
+        };
+      }
 
-        // سطر HTML
-        const rowHtml = `
-            <tr>
-                <td>${timeStr}</td>
-                <td>${devName}</td>
-                <td>${tempStr}</td>
-                <td>${co2Str}</td>
-                <td>${presenceStr}</td>
-                <td>${fatigueStr}</td>
-            </tr>
+      const co2Scale  = scaleY(co2Vals, 400);
+      const tempScale = scaleY(tempVals, 15,35);
+      const fScale    = scaleY(fVals, 0, 100);
+
+      function drawLine(vals, scale, strokeStyle){
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = strokeStyle;
+        vals.forEach((v,i)=>{
+          const y = scale.fn(v);
+          if(y===null)return;
+          const x = (i/(vals.length-1||1))* (w-40) + 20;
+          if(i===0) ctx.moveTo(x,y);
+          else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+      }
+
+      // CO₂ بخليها لون بني دافئ/ذهبي
+      drawLine(co2Vals, co2Scale, "var(--brand-main)");
+      // °C بخليها أخضر زيتوني هادي
+      drawLine(tempVals, tempScale, "var(--ok)");
+      // F% بخليها بني أغمق
+      drawLine(fVals, fScale, "var(--brand-dark)");
+
+      ctx.textAlign = "right";
+      ctx.font = "11px system-ui";
+      ctx.fillStyle = "var(--brand-main)";
+      ctx.fillText("CO₂", w-10, h-40);
+
+      ctx.fillStyle = "var(--ok)";
+      ctx.fillText("°C",  w-10, h-28);
+
+      ctx.fillStyle = "var(--brand-dark)";
+      ctx.fillText("إجهاد%", w-10, h-16);
+    }
+
+    function renderTable(){
+      const rows = latestData.slice(0,10);
+      if(!rows.length){
+        readingsBodyEl.innerHTML =
+          '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);">لا توجد بيانات بعد</td></tr>';
+        return;
+      }
+
+      readingsBodyEl.innerHTML = rows.map(item=>{
+        const v = item.value || {};
+        const ts   = v.ts;
+        const timeStr = fmtFullTimeFromTS(ts);
+
+        const F = (v.F != null && !isNaN(v.F)) ? `${v.F}%` : "—";
+        const presence = v.presence === 1 ? "1" : "0";
+        const co2 = (v.co2 != null && !isNaN(v.co2)) ? v.co2 : "—";
+        const t   = (v.t   != null && !isNaN(v.t))   ? v.t.toFixed(1) : "—";
+        const bpm = (v.bpm != null && !isNaN(v.bpm)) ? v.bpm.toFixed(1) : "—";
+        const dist= (v.dist!= null && !isNaN(v.dist))? `${v.dist.toFixed(0)}cm`:"—";
+
+        return `
+          <tr>
+            <td>${timeStr}</td>
+            <td>${deviceName}</td>
+            <td>${F}</td>
+            <td>${presence}</td>
+            <td>${co2}</td>
+            <td>${t}</td>
+            <td>${bpm}</td>
+            <td>${dist}</td>
+          </tr>
         `;
-
-        // نعرض الـlive كأول صف (ونبقي الأقدم تحت)
-        // strategy: نحط row جديد بالـtop.
-        // لو تبين تخليه دايم صف واحد, احذفي الباقي أول.
-        // الآن بخليه يراكم.
-        tbody.insertAdjacentHTML("afterbegin", rowHtml);
-
-        // لو تبين ما يتضخم الجدول جداً
-        // حد أقصى 20 سطر
-        while (tbody.rows && tbody.rows.length > 20) {
-            tbody.deleteRow(tbody.rows.length - 1);
-        }
+      }).join("");
     }
 
-    // دالة واحدة تحدث كل شيء
-    async function updateAll() {
-        try {
-            const live = await fetchLive();
-            updateCardsFromLive(live);
-            updateTableFromLive(live);
-        } catch (err) {
-            console.error("updateAll error:", err);
-        }
+    function renderSessionOverview(){
+      if(!latestData.length) return;
+      const latest = latestData[0].value || {};
+
+      lastUpdatedEl.textContent = "آخر تحديث: " + fmtFullTimeFromTS(latest.ts);
+
+      // الوجود
+      const presTxt = latest.presence === 1 ? "موجود" : "مو موجود";
+      presenceValEl.textContent = latest.presence === 1 ? "1" : "0";
+      presenceBadgeEl.textContent = presTxt;
+      presenceBadgeEl.style.background =
+        latest.presence === 1
+          ? "rgba(91,127,74,.15)" // var(--ok) لكن شفاف
+          : "rgba(194,165,125,.18)";
+      presenceBadgeEl.style.color =
+        latest.presence === 1
+          ? "var(--ok)"
+          : "var(--text-main)";
+
+      // CO₂
+      const co2ppm = latest.co2;
+      co2ValEl.textContent = (co2ppm!=null && !isNaN(co2ppm)) ? co2ppm : "—";
+      const {label:co2Label,color:co2Color} = co2Status(co2ppm);
+      co2QualityEl.textContent = co2Label;
+      co2QualityEl.style.color = co2Color;
+
+      // حرارة
+      const tempC = latest.t;
+      tempValEl.textContent = (tempC!=null && !isNaN(tempC)) ? tempC.toFixed(1) : "—";
+      const {label:tempLabel,color:tempColor} = tempStatus(tempC);
+      tempComfortEl.textContent = tempLabel;
+      tempComfortEl.style.color = tempColor;
+
+      // إجهاد
+      let Fpct = latest.F != null && !isNaN(latest.F) ? Number(latest.F) : 0;
+      if(Fpct<0) Fpct=0;
+      if(Fpct>100) Fpct=100;
+
+      fatigueNumEl.textContent = Fpct.toFixed(0) + "%";
+      const circleLen = 314;
+      const off = circleLen - (circleLen * (Fpct/100));
+      fatigueRingEl.setAttribute("stroke-dashoffset", off.toString());
+      fatigueRingEl.setAttribute("stroke", fatigueColor(Fpct));
+
+      if(Fpct >= 100){
+        fatigueHintEl.textContent = "جسمك خلص. خذ استراحة حقيقية 🙏";
+      } else if(Fpct >= 70){
+        fatigueHintEl.textContent = "قربت توصل حدك. بريك قصير الآن ✋";
+      } else {
+        fatigueHintEl.textContent = "وضعك آمن 👌";
+      }
+
+      chartDeviceNameEl.textContent = deviceName;
+      tableMetaEl.textContent = deviceName;
     }
 
-    // تشغيل أولي
-    renderAutoRefreshToggle();
-    updateAll();
-
-    // لوب التحديث التلقائي
-    setInterval(() => {
-        if (autoRefreshOn) {
-            updateAll();
+    async function fetchLatest(){
+      try {
+        const devRes = await fetch('/api/devices');
+        const devices = await devRes.json();
+        if (Array.isArray(devices) && devices.length > 0){
+          deviceName = devices[0];
         }
+      } catch (err){
+        console.warn("devices fetch fail", err);
+      }
+
+      try {
+        const dataRes = await fetch('/api/data?limit=50&device='+encodeURIComponent(deviceName));
+        const arr = await dataRes.json();
+        if(Array.isArray(arr)){
+          latestData = arr;
+        }
+      } catch (err){
+        console.warn("data fetch fail", err);
+      }
+
+      renderSessionOverview();
+      renderTable();
+      drawChart();
+    }
+
+    fetchLatest();
+    setInterval(()=>{
+      if(autoRefresh){
+        fetchLatest();
+      }
     }, 5000);
-    </script>
-
-    <!--
-    ملاحظة:
-    - لو حابة تضيفين الرسم البياني (Chart.js مثلاً) من /api/data،
-      نقدر بالمستقبل نجيب /api/data?limit=50 ونبني arrays لدرجة الحرارة / co2 مع timestamps
-      وبعدها نرسمهم.
-
-    - أهم شيء الآن: الصفحة ما تطلع بيضاء، وفيها live data تتحدث من Firebase
-      عبر السيرفر (بدون ما تخلي المتصفح يتكلم مع Firebase مباشرة).
-    -->
-
+  </script>
 </body>
 </html>
