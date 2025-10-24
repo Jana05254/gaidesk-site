@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h4 class="mb-3">إعدادات التنبيه</h4>
+
+<form class="card p-3" onsubmit="return saveSettings(event)">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">حساسية الوضعية</label>
+      <select id="posture" class="form-select">
+        <option>Low</option><option selected>Medium</option><option>High</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">حساسية التنفس</label>
+      <select id="breath" class="form-select">
+        <option>Low</option><option selected>Medium</option><option>High</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">التحذير المرحلي (%)</label>
+      <input id="stage" type="number" class="form-control" min="10" max="95" value="70">
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <label class="form-label">الاستراحة الإجبارية (%)</label>
+    <input id="force" type="number" class="form-control" min="50" max="100" value="100">
+  </div>
+
+  <div class="mt-3 d-flex align-items-center gap-3">
+    <button class="btn btn-primary" type="submit">حفظ</button>
+    <span id="msg" class="text-success"></span>
+  </div>
+</form>
+
+<script>
+async function loadSettings(){
+  const r = await fetch('/api/settings', {cache:'no-store'});
+  const s = await r.json();
+  posture.value = s.posture_sensitivity ?? 'Medium';
+  breath.value  = s.breath_sensitivity ?? 'Medium';
+  stage.value   = Math.round((s.stage_threshold ?? 0.7)*100);
+  force.value   = Math.round((s.force_break_at ?? 1.0)*100);
+}
+async function saveSettings(e){
+  e.preventDefault();
+  const body = {
+    posture_sensitivity: posture.value,
+    breath_sensitivity:  breath.value,
+    stage_threshold:     Number(stage.value)/100,
+    force_break_at:      Number(force.value)/100
+  };
+  const r = await fetch('/api/settings', {
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+  });
+  const out = await r.json();
+  msg.textContent = out.ok ? 'تم الحفظ 🎉' : 'تعذّر الحفظ';
+  setTimeout(()=> msg.textContent='', 2500);
+}
+loadSettings();
+</script>
+{% endblock %}
