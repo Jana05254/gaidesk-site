@@ -1,7 +1,155 @@
-{% extends "base.html" %}
-{% block content %}
-<h4 class="mb-2">عن GAIDESK</h4>
-<p>مشروع لمراقبة البيئة الداخلية (حرارة، CO₂، وجود، مخاطر) مع ESP32 وFirebase، وواجهة ويب عبر Flask.</p>
-<h6 class="mt-4">الخصوصية</h6>
-<p class="text-muted small">لا يتم جمع أي بيانات شخصية. يتم تخزين قراءات المستشعرات فقط.</p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>عن GAIDESK</title>
+<style>
+  body{
+    background:#eef4ef;
+    margin:0;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    color:#2b241a;
+  }
+  .shell{
+    max-width:800px;
+    margin:32px auto 64px;
+    background:#fff;
+    border-radius:20px;
+    border:1px solid rgba(43,36,26,.08);
+    box-shadow:
+      0 16px 40px rgba(43,36,26,.08),
+      0 3px 8px rgba(43,36,26,.05);
+    padding:24px 24px 32px;
+  }
+  h1{
+    font-size:18px;
+    font-weight:600;
+    margin:0 0 8px 0;
+    color:#2b241a;
+    letter-spacing:-0.03em;
+  }
+  .dim{
+    font-size:13px;
+    color:rgba(43,36,26,.55);
+    line-height:1.6;
+    margin-bottom:24px;
+  }
+  .section{
+    margin-bottom:24px;
+  }
+  h2{
+    font-size:15px;
+    font-weight:600;
+    color:#2b241a;
+    margin:0 0 8px 0;
+    letter-spacing:-0.03em;
+  }
+  p{
+    font-size:14px;
+    line-height:1.7;
+    margin:0 0 16px 0;
+    color:#2b241a;
+  }
+  .tagList{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+  }
+  .tag{
+    background:#e9f3e9;
+    color:#2b241a;
+    border:1px solid rgba(91,127,74,.18);
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:999px;
+    box-shadow:0 8px 24px rgba(91,127,74,.08);
+  }
+  footer{
+    margin-top:32px;
+    text-align:center;
+    font-size:12px;
+    color:rgba(43,36,26,.55);
+  }
+  footer a{
+    color:#6d5a3e;
+    text-decoration:none;
+    font-weight:500;
+  }
+  footer a:hover{
+    text-decoration:underline;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <h1>GAIDESK</h1>
+  <div class="dim">
+    جهاز مكتبي ذكي يراقب جسمك وبيئتك بنفس الوقت،
+    ويشجعك تحافظ على وضعية صحية وتركيز بدون ما تدمّر جسمك.
+  </div>
+
+  <div class="section">
+    <h2>وش يسوي GAIDESK؟</h2>
+    <p>
+      GAIDESK يتابع وضعيتك، تنفسك، قربك من الشاشة، وجودك فعليًا على المكتب،
+      و جودة الهواء (مثل CO₂ و الحرارة).
+    </p>
+    <p>
+      بدال من منبّه تايمر ثابت، GAIDESK يقيس <strong>تعب جسمك الحقيقي</strong>.
+      يعني يعطيك تنبيه وقت ما <em>أنت</em> تحتاج توقف،
+      مو بعد 30 دقيقة عشوائيًا.
+    </p>
+    <div class="tagList">
+      <div class="tag">مراقبة الوضعية</div>
+      <div class="tag">تنفس و BPM</div>
+      <div class="tag">CO₂ / جودة الهواء</div>
+      <div class="tag">تحذير إجهاد ذكي</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>مين يحتاجه؟</h2>
+    <p>
+      1) الناس اللي يغرقون في التركيز (مبرمجين، طلاب، أو ناس عندهم فرط التركيز)
+      وينسون جسمهم.
+    </p>
+    <p>
+      2) أي شخص يجلس ساعات طويلة (طلاب مذاكرة / موظفين مكاتب).
+      نفس المشاكل تتكرر: آلام ظهر، صداع من CO₂، تشتت، تعب.
+    </p>
+    <p>
+      GAIDESK يساعدك تتوقف قبل ما توصل مرحلة وجع.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>ليش مختلف؟</h2>
+    <p>
+      الأدوات الموجودة الآن عادة:
+      - إما تعطيك منبّه كل نصف ساعة بدون ما تفهم وضعك الحقيقي،
+      - أو تركز على نقطة وحدة (مثلاً: جلست كثير؟ قم!)
+    </p>
+    <p>
+      GAIDESK يبني <strong>baseline</strong> لك أنت:
+      كيف تتنفس وانت مرتاح؟ كم تبعد عن الشاشة عادة؟ متى يبدأ جسمك يتعب؟
+      وبعدها ينبهك متى "وصلت الحد"، مو متى خلص المؤقت.
+    </p>
+  </div>
+
+  <footer>
+    <div>© <span id="yearNow"></span> GAIDESK</div>
+    <div>
+      تواصل: <a href="https://www.linkedin.com/in/YOUR_LINKEDIN" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  document.getElementById('yearNow').textContent =
+    new Date().getFullYear().toString();
+</script>
+</body>
+</html>

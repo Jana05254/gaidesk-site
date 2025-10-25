@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ملخص آخر جلسة | GAIDESK</title>
+
+<style>
+  body {
+    background:#eef4ef;
+    margin:0;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    color:#2b241a;
+  }
+  .wrap {
+    max-width:800px;
+    margin:32px auto 64px;
+    background:#fff;
+    border:1px solid rgba(43,36,26,.08);
+    box-shadow:
+      0 16px 40px rgba(43,36,26,.08),
+      0 3px 8px rgba(43,36,26,.05);
+    border-radius:20px;
+    padding:24px 24px 32px;
+  }
+  .title {
+    font-size:16px;
+    font-weight:600;
+    color:#2b241a;
+    letter-spacing:-0.03em;
+    margin-bottom:4px;
+  }
+  .subtitle {
+    font-size:13px;
+    color:rgba(43,36,26,.55);
+    margin-bottom:24px;
+    line-height:1.5;
+  }
+
+  .grid2 {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:16px;
+    margin-bottom:24px;
+  }
+  .card {
+    background:#e9f3e9;
+    border-radius:14px;
+    border:1px solid rgba(91,127,74,.15);
+    box-shadow:0 12px 32px rgba(91,127,74,.08);
+    padding:16px;
+    min-height:120px;
+  }
+  .cardTitle{
+    font-size:13px;
+    font-weight:500;
+    color:#2b241a;
+    letter-spacing:-0.03em;
+    margin-bottom:8px;
+  }
+  .bigNum{
+    font-size:24px;
+    font-weight:600;
+    color:#2b241a;
+    letter-spacing:-0.04em;
+    line-height:1.2;
+    margin-bottom:4px;
+  }
+  .dimText{
+    font-size:12px;
+    color:rgba(43,36,26,.55);
+    line-height:1.4;
+  }
+
+  .alertsBox{
+    background:#fff5ec;
+    border-radius:14px;
+    border:1px solid rgba(196,163,107,.4);
+    padding:16px;
+    font-size:13px;
+    line-height:1.6;
+    margin-bottom:24px;
+    color:#2b241a;
+  }
+  .sectionHead{
+    font-size:14px;
+    font-weight:600;
+    color:#2b241a;
+    margin-bottom:8px;
+    letter-spacing:-0.03em;
+  }
+  .statRow{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    border-bottom:1px solid rgba(43,36,26,.07);
+    padding:8px 0;
+  }
+  .statRow:last-child{
+    border-bottom:none;
+  }
+
+  footer {
+    margin-top:32px;
+    text-align:center;
+    font-size:12px;
+    color:rgba(43,36,26,.55);
+  }
+  footer a{
+    color:#6d5a3e;
+    text-decoration:none;
+    font-weight:500;
+  }
+  footer a:hover{
+    text-decoration:underline;
+  }
+
+  @media(max-width:600px){
+    .grid2{
+      grid-template-columns:1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title">ملخص آخر جلسة</div>
+  <div class="subtitle" id="sessionInfo">
+    (لا يوجد جلسة منتهية بعد)
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="cardTitle">مدة الجلسة</div>
+      <div class="bigNum" id="durationTxt">--</div>
+      <div class="dimText" id="timeRangeTxt">--</div>
+    </div>
+
+    <div class="card">
+      <div class="cardTitle">تقييم عام</div>
+      <div class="bigNum" id="ratingTxt">--</div>
+      <div class="dimText" id="adviceTxt">نصائح لتحسين الجلسة القادمة</div>
+    </div>
+  </div>
+
+  <div class="alertsBox">
+    <div class="sectionHead">ملخص التنبيهات</div>
+    <div class="statRow"><div>قريب جداً من الشاشة</div><div id="nearCount">0</div></div>
+    <div class="statRow"><div>CO₂ مرتفع</div><div id="co2Count">0</div></div>
+    <div class="statRow"><div>تحذير إجهاد (أصفر)</div><div id="warn1Count">0</div></div>
+    <div class="statRow"><div>إجهاد شديد (أحمر)</div><div id="warn2Count">0</div></div>
+  </div>
+
+  <div style="margin-bottom:24px;">
+    <div class="sectionHead">إحصائيات الجلسة</div>
+    <div class="dimText" style="margin-bottom:12px;">أقل / متوسط / أعلى</div>
+
+    <div class="statRow"><div>المسافة (cm)</div><div id="distStats">--</div></div>
+    <div class="statRow"><div>CO₂</div><div id="co2Stats">--</div></div>
+    <div class="statRow"><div>الحرارة (°C)</div><div id="tempStats">--</div></div>
+    <div class="statRow"><div>الإجهاد F</div><div id="fatigueStats">--</div></div>
+    <div class="statRow"><div>نبض/تنفس (bpm)</div><div id="bpmStats">--</div></div>
+  </div>
+
+  <footer>
+    <div>© <span id="yearNow"></span> GAIDESK</div>
+    <div>
+      للمزيد: <a href="https://www.linkedin.com/in/YOUR_LINKEDIN" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+  const yearNowEl = document.getElementById('yearNow');
+  yearNowEl.textContent = new Date().getFullYear().toString();
+
+  // عناصر
+  const sessionInfoEl  = document.getElementById('sessionInfo');
+  const durationTxtEl  = document.getElementById('durationTxt');
+  const timeRangeTxtEl = document.getElementById('timeRangeTxt');
+  const ratingTxtEl    = document.getElementById('ratingTxt');
+  const adviceTxtEl    = document.getElementById('adviceTxt');
+
+  const nearCountEl    = document.getElementById('nearCount');
+  const co2CountEl     = document.getElementById('co2Count');
+  const warn1CountEl   = document.getElementById('warn1Count');
+  const warn2CountEl   = document.getElementById('warn2Count');
+
+  const distStatsEl    = document.getElementById('distStats');
+  const co2StatsEl     = document.getElementById('co2Stats');
+  const tempStatsEl    = document.getElementById('tempStats');
+  const fatigueStatsEl = document.getElementById('fatigueStats');
+  const bpmStatsEl     = document.getElementById('bpmStats');
+
+  function fmtDur(sec){
+    if(!sec && sec!==0) return "--";
+    const h = Math.floor(sec/3600);
+    const m = Math.floor((sec%3600)/60);
+    if(h>0) return h+"س "+m+"د";
+    return m+"د";
+  }
+
+  function fmtTime(ts){
+    if(!ts) return "—";
+    const d = new Date(ts);
+    return d.toLocaleString('ar-SA', {
+      hour:'2-digit', minute:'2-digit',
+      weekday:'short'
+    });
+  }
+
+  function bestRating(summary){
+    // نفس منطق الجهاز تقريبياً:
+    // إذا warn2Count أو near+co2 >=3 => "سيئ"
+    // إذا warn1Count>0 أو near+co2>=1 => "مقبول"
+    // وإلا "ممتاز"
+    const nearN = summary.alerts?.near || 0;
+    const co2N  = summary.alerts?.co2  || 0;
+    const warn1 = summary.alerts?.warn1 || 0;
+    const warn2 = summary.alerts?.warn2 || 0;
+
+    if (warn2>0 || (nearN+co2N)>=3) {
+      return {label:"سيّء", tip:"جلسة متعبة جداً. لازم فترات راحة أقصر وتهوية أفضل."};
+    }
+    if (warn1>0 || (nearN+co2N)>=1){
+      return {label:"مقبول", tip:"حاول تنتبه لوضعيتك وتاخذ بريكات صغيرة قبل ما تتعب كثير."};
+    }
+    return {label:"ممتاز", tip:"جلسة ممتازة. حافظ على العادة 👌"};
+  }
+
+  async function fetchSummary(){
+    const res = await fetch('/api/session-summary');
+    const data = await res.json();
+
+    if(!data || !data.session_key){
+      sessionInfoEl.textContent = "مافي جلسة مكتملة لعرضها حالياً.";
+      return;
+    }
+
+    // وقت البداية والنهاية
+    const startTs = data.start_ts;
+    const endTs   = data.end_ts;
+    const durSec  = data.duration_sec;
+    sessionInfoEl.textContent =
+      "الجلسة: " + data.session_key + " | الحالة: " + (data.status || "؟");
+
+    durationTxtEl.textContent  = fmtDur(durSec);
+    timeRangeTxtEl.textContent = fmtTime(startTs) + " → " + fmtTime(endTs);
+
+    // تقييم عام
+    const rate = bestRating(data);
+    ratingTxtEl.textContent = rate.label;
+    adviceTxtEl.textContent = rate.tip;
+
+    // Alerts
+    nearCountEl.textContent  = data.alerts?.near  ?? 0;
+    co2CountEl.textContent   = data.alerts?.co2   ?? 0;
+    warn1CountEl.textContent = data.alerts?.warn1 ?? 0;
+    warn2CountEl.textContent = data.alerts?.warn2 ?? 0;
+
+    // Stats (min/avg/max)
+    function mkStats(obj, unit=""){
+      if(!obj) return "--";
+      const mi = (obj.min!=null)?obj.min.toFixed?obj.min.toFixed(1):obj.min:"-";
+      const av = (obj.avg!=null)?obj.avg.toFixed?obj.avg.toFixed(1):obj.avg:"-";
+      const ma = (obj.max!=null)?obj.max.toFixed?obj.max.toFixed(1):obj.max:"-";
+      return mi+unit+" / "+av+unit+" / "+ma+unit;
+    }
+
+    distStatsEl.textContent    = mkStats(data.stats?.dist,"cm");
+    co2StatsEl.textContent     = mkStats(data.stats?.co2,"");
+    tempStatsEl.textContent    = mkStats(data.stats?.temp,"°");
+    fatigueStatsEl.textContent = mkStats(data.stats?.F,"");
+    bpmStatsEl.textContent     = mkStats(data.stats?.bpm," bpm");
+  }
+
+  fetchSummary();
+</script>
+</body>
+</html>
