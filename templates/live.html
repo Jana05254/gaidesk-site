@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>GAIDESK Dashboard</title>
+<title>GAIDESK Live Dashboard</title>
 
 <style>
   :root {
@@ -11,20 +11,18 @@
     --panel-bg: #ffffff;
     --panel-border: rgba(43,36,26,.08);
 
-    --brand-main: #6d5a3e;       /* بني دافئ */
+    --brand-main: #6d5a3e;
     --brand-dark: #2b241a;
-    --mint-soft: #e9f3e9;        /* نعناع فاتح */
-    --ok: #5b7f4a;               /* أخضر إنتاجي */
-    --warn: #c4a36b;             /* تحذير دافئ */
-    --bad: #b64e42;              /* أحمر تنبيه */
+    --mint-soft: #e9f3e9;
+    --ok: #5b7f4a;
+    --warn: #c4a36b;
+    --bad: #b64e42;
 
     --text-main: #2b241a;
     --text-dim: rgba(43,36,26,.55);
-    --text-faint: rgba(43,36,26,.35);
 
     --radius-lg: 20px;
     --radius-md: 14px;
-    --radius-sm: 8px;
 
     --shadow-card: 0 16px 40px rgba(43,36,26,.08),
                    0 3px 8px rgba(43,36,26,.05);
@@ -32,6 +30,10 @@
                    0 1px 4px rgba(43,36,26,.04);
 
     --ring-track: rgba(43,36,26,.07);
+
+    --blur-bg:rgba(255,255,255,.55);
+    --blur-border:rgba(255,255,255,.4);
+    --blur-shadow:0 20px 60px rgba(43,36,26,.20);
   }
 
   body {
@@ -42,61 +44,97 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  header {
-    background: var(--panel-bg);
-    border-bottom: 1px solid var(--panel-border);
-    box-shadow: 0 4px 16px rgba(43,36,26,.04);
-    padding: 12px 16px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
+  /* navbar الشفاف نفس Landing */
+  header.navShell {
+    position:sticky;
+    top:0;
+    z-index:100;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background:var(--blur-bg);
+    border-bottom:1px solid var(--blur-border);
+    box-shadow:var(--blur-shadow);
+    padding:12px 16px;
   }
-
-  .brandTitle {
-    font-weight: 600;
-    color: var(--brand-dark);
-    font-size: 15px;
-    letter-spacing: -0.03em;
+  .navInner {
+    max-width:1200px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:16px;
   }
-
+  .brandArea {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:600;
+    color:var(--brand-dark);
+    font-size:15px;
+    letter-spacing:-0.03em;
+  }
+  .brandLogo {
+    width:32px;
+    height:32px;
+    border-radius:10px;
+    background:#e9f3e9;
+    border:1px solid rgba(91,127,74,.25);
+    box-shadow:0 10px 24px rgba(91,127,74,.25);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .brandLogo img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+  }
   nav.topNav {
-    display: flex;
-    gap: 12px;
-    font-size: 13px;
-    flex-wrap: wrap;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    font-size:13px;
+    margin-inline-start:auto;
+    margin-inline-end:0;
   }
   nav.topNav a {
-    color: var(--text-main);
-    text-decoration: none;
-    background: rgba(43,36,26,.04);
-    padding: 6px 10px;
-    border-radius: 10px;
-    line-height:1.2;
+    --bg:rgba(43,36,26,.04);
+    background:var(--bg);
     border:1px solid rgba(43,36,26,.07);
+    color:var(--text-main);
+    text-decoration:none;
+    padding:7px 12px;
+    border-radius:999px;
+    line-height:1.2;
+    font-weight:500;
+    transition:all .16s;
   }
   nav.topNav a.active {
-    background: var(--mint-soft);
-    border-color: rgba(91,127,74,.25);
-    color: var(--brand-dark);
-    font-weight:500;
+    background:var(--mint-soft);
+    border-color:rgba(91,127,74,.4);
+    color:var(--brand-dark);
+    box-shadow:0 12px 32px rgba(91,127,74,.18);
   }
   nav.topNav a:hover {
-    background: rgba(43,36,26,.07);
+    background:rgba(43,36,26,.07);
   }
 
-  .spacer {
-    flex: 1;
+  main {
+    padding:16px;
+    max-width:1200px;
+    margin:0 auto 64px auto;
   }
 
   .autoRefreshToggle {
-    display: flex;
-    align-items: center;
+    display:flex;
+    align-items:center;
     gap:8px;
-    font-size: 13px;
-    color: var(--text-main);
-    cursor: pointer;
-    user-select: none;
+    font-size:13px;
+    color:var(--text-main);
+    cursor:pointer;
+    user-select:none;
+    margin-bottom:16px;
   }
   .autoRefreshToggle .switchOuter {
     width:34px;
@@ -124,12 +162,6 @@
     left:17px;
   }
 
-  main {
-    padding:16px;
-    max-width:1200px;
-    margin:0 auto 64px auto;
-  }
-
   /* بانر التنبيه */
   .alertBanner {
     display:none;
@@ -151,7 +183,7 @@
     color: var(--warn);
   }
 
-  /* اللوحة الرئيسية */
+  /* اللوحة الحية */
   .liveWrapper {
     background: var(--panel-bg);
     border:1px solid var(--panel-border);
@@ -202,7 +234,6 @@
     justify-content:space-between;
     box-shadow:0 12px 32px rgba(91,127,74,.08);
   }
-
   .statHead {
     font-size:13px;
     font-weight:500;
@@ -212,7 +243,6 @@
     align-items:center;
     justify-content:space-between;
   }
-
   .mainValue {
     font-size:28px;
     font-weight:600;
@@ -220,13 +250,11 @@
     letter-spacing:-0.04em;
     line-height:1.2;
   }
-
   .mainValueUnit {
     font-size:14px;
     font-weight:400;
     color:var(--text-dim);
   }
-
   .subNote {
     font-size:12px;
     color:var(--text-dim);
@@ -244,20 +272,17 @@
     display:flex;
     gap:16px;
   }
-
   .fatigueRingWrap {
     position:relative;
     width:88px;
     height:88px;
     flex-shrink:0;
   }
-
   .fatigueRingWrap svg {
     width:88px;
     height:88px;
     display:block;
   }
-
   .fatigueNumCenter {
     position:absolute;
     inset:0;
@@ -269,20 +294,17 @@
     color:var(--brand-dark);
     text-align:center;
   }
-
   .fatigueNumCenter .bigFatigue {
     font-size:22px;
     line-height:1.1;
     letter-spacing:-0.04em;
   }
-
   .fatigueNumLabel {
     font-size:11px;
     color:var(--text-dim);
     line-height:1.2;
     margin-top:2px;
   }
-
   .fatigueHintBox {
     flex:1;
     min-width:0;
@@ -290,7 +312,6 @@
     flex-direction:column;
     justify-content:center;
   }
-
   .fatigueHintTitle {
     font-size:14px;
     font-weight:500;
@@ -298,7 +319,6 @@
     margin-bottom:4px;
     letter-spacing:-0.03em;
   }
-
   .fatigueHintText {
     font-size:13px;
     color:var(--text-dim);
@@ -314,7 +334,6 @@
     box-shadow: var(--shadow-card);
     overflow:hidden;
   }
-
   .tableHeaderBar {
     padding:16px 20px;
     border-bottom:1px solid var(--panel-border);
@@ -324,31 +343,26 @@
     justify-content:space-between;
     align-items:flex-start;
   }
-
   .tableHeaderMain {
     font-size:15px;
     font-weight:600;
     color:var(--brand-dark);
     letter-spacing:-0.03em;
   }
-
   .tableHeaderSub {
     font-size:12px;
     color: var(--text-dim);
     letter-spacing:-0.02em;
   }
-
   .tableScrollWrap {
     overflow-x:auto;
   }
-
   table {
     width:100%;
     border-collapse:collapse;
     min-width:600px;
     font-size:13px;
   }
-
   thead th {
     text-align:right;
     background: var(--mint-soft);
@@ -358,18 +372,15 @@
     border-bottom:1px solid rgba(43,36,26,.1);
     white-space:nowrap;
   }
-
   tbody td {
     padding:10px 12px;
     border-bottom:1px solid rgba(43,36,26,.06);
     color:var(--text-main);
     white-space:nowrap;
   }
-
   tbody tr:hover {
     background:rgba(43,36,26,.03);
   }
-
   .mutedCell {
     color:var(--text-dim);
   }
@@ -382,51 +393,50 @@
     color:var(--text-dim);
     line-height:1.6;
   }
-
   footer a {
     color:var(--brand-main);
     text-decoration:none;
     font-weight:500;
   }
-
   footer a:hover {
     text-decoration:underline;
   }
 
   @media (min-width:768px){
-    .liveWrapper {
-      padding:32px;
-    }
-    .cardsRow {
-      grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-    }
-    .fatigueCard {
-      min-height:160px;
-    }
+    .liveWrapper { padding:32px; }
+    .cardsRow { grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); }
+    .fatigueCard { min-height:160px; }
   }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="brandTitle">GAIDESK</div>
+<header class="navShell">
+  <div class="navInner">
+    <div class="brandArea">
+      <div class="brandLogo">
+        <img src="/static/logo.png" alt="GAIDESK Logo"/>
+      </div>
+      <div>GAIDESK</div>
+    </div>
 
-  <nav class="topNav">
-    <a href="/" class="active">المراقبة الآن</a>
-    <a href="/session">ملخص الجلسة</a>
-    <a href="/about">عن GAIDESK</a>
-  </nav>
-
-  <div class="spacer"></div>
-
-  <div id="refreshToggle" class="autoRefreshToggle active">
-    <div style="font-size:13px;">تحديث تلقائي</div>
-    <div class="switchOuter"><div class="switchDot"></div></div>
+    <nav class="topNav">
+      <a href="/">الرئيسية</a>
+      <a class="active" href="/live">المراقبة الآن</a>
+      <a href="/session">ملخص الجلسة</a>
+      <a href="/about">عن المشروع</a>
+    </nav>
   </div>
 </header>
 
 <main>
+
+  <!-- زر التحديث التلقائي -->
+  <div id="refreshToggle" class="autoRefreshToggle active">
+    <div style="font-size:13px;">تحديث تلقائي</div>
+    <div class="switchOuter"><div class="switchDot"></div></div>
+  </div>
 
   <!-- بانر التنبيهات -->
   <div id="alertBanner" class="alertBanner"></div>
@@ -452,18 +462,15 @@
           <span id="presenceBadge"
                 style="font-size:12px;border-radius:999px;padding:2px 8px;
                        background:rgba(196,163,107,.15);
-                       color:var(--text-main);
-                       min-width:fit-content;">
+                       color:var(--text-main);">
             —
           </span>
         </div>
-
         <div class="mainValue" id="presenceVal">0</div>
-
         <div class="subNote">
-          1 = موجود على المكتب الآن
+          1 = المستخدم جالس الآن
           <br/>
-          0 = مو جالس فعليًا
+          0 = المستخدم مو موجود
         </div>
       </div>
 
@@ -482,9 +489,7 @@
           <span class="mainValueUnit">ppm</span>
         </div>
 
-        <div class="subNote">
-          جودة الهواء في منطقة عملك
-        </div>
+        <div class="subNote">جودة الهواء حوالين المكتب</div>
       </div>
 
       <!-- الحرارة -->
@@ -502,9 +507,7 @@
           <span class="mainValueUnit">°C</span>
         </div>
 
-        <div class="subNote">
-          راحة الجو حوالينك
-        </div>
+        <div class="subNote">هل المكان مريح أو خانق</div>
       </div>
 
       <!-- الإجهاد -->
@@ -544,7 +547,7 @@
 
   </section>
 
-  <!-- جدول القراءات -->
+  <!-- جدول آخر القراءات -->
   <section class="readingsSection">
     <div class="tableHeaderBar">
       <div class="tableHeaderMain">آخر القراءات</div>
@@ -594,10 +597,9 @@
 </footer>
 
 <script>
-  // اسم الجهاز اللي نبغى نعرضه
+  // نفس سكريبت جلب البيانات اللي عطيتك قبل 👇
   let deviceName = "GAIDESK-01";
 
-  // عناصر الصفحة
   const lastUpdatedEl    = document.getElementById('lastUpdated');
   const presenceBadgeEl  = document.getElementById('presenceBadge');
   const presenceValEl    = document.getElementById('presenceVal');
@@ -621,24 +623,18 @@
 
   const refreshToggleEl  = document.getElementById('refreshToggle');
 
-  // سنة الحقوق
   yearNowEl.textContent = new Date().getFullYear().toString();
-
-  // ثبّت الاسم
   deviceNameEl.textContent = deviceName;
-  tableMetaEl.textContent  = deviceName;
+  tableMetaEl.textContent = deviceName;
 
-  // تحكم التحديث التلقائي
   let autoRefresh = true;
   refreshToggleEl.addEventListener('click', () => {
     autoRefresh = !autoRefresh;
     refreshToggleEl.classList.toggle('active', autoRefresh);
   });
 
-  // نخزن آخر قراءات علشان ما نرسم شي فاضي
   let latestData = [];
 
-  // Helpers
   function co2Status(ppm){
     if (ppm == null || isNaN(ppm))
       return {label:"—", color:"var(--text-dim)", level:"none"};
@@ -650,7 +646,6 @@
       return {label:"سيّء", color:"var(--warn)", level:"warn"};
     return {label:"خطر", color:"var(--bad)", level:"bad"};
   }
-
   function tempStatus(c){
     if (c == null || isNaN(c))
       return {label:"—", color:"var(--text-dim)"};
@@ -658,13 +653,11 @@
       return {label:"مريح", color:"var(--ok)"};
     return {label:"غير مريح", color:"var(--warn)"};
   }
-
   function fatigueColor(pct){
     if (pct >= 100) return "var(--bad)";
     if (pct >= 70)  return "var(--warn)";
     return "var(--ok)";
   }
-
   function fmtFullTimeFromTS(ts){
     if (!ts) return "—";
     const d = new Date(ts);
@@ -674,19 +667,15 @@
     });
   }
 
-  // تحديث البطاقات الرئيسية
   function renderMainCards(){
     if(!latestData.length) return;
     const latest = latestData[0];
 
-    // الوقت
     lastUpdatedEl.textContent = "آخر تحديث: " +
       fmtFullTimeFromTS(latest.ts || latest.ts_ms);
 
-    // وجود
     const isHere = (latest.presence === 1);
     presenceValEl.textContent = isHere ? "1" : "0";
-
     presenceBadgeEl.textContent = isHere ? "موجود" : "غير موجود";
     presenceBadgeEl.style.background = isHere
       ? "rgba(91,127,74,.15)"
@@ -695,67 +684,55 @@
       ? "var(--ok)"
       : "var(--text-main)";
 
-    // CO₂
     const ppm = latest.co2;
-    const {label:co2Label,color:co2Color,level:co2Level} = co2Status(ppm);
+    const co2Stat = co2Status(ppm);
     co2ValEl.textContent = (ppm!=null && !isNaN(ppm)) ? ppm : "—";
-    co2QualityEl.textContent = co2Label;
-    co2QualityEl.style.color = co2Color;
+    co2QualityEl.textContent = co2Stat.label;
+    co2QualityEl.style.color = co2Stat.color;
 
-    // حرارة
     const tC = latest.t;
-    const {label:tempLabel,color:tempColor} = tempStatus(tC);
+    const tempStat = tempStatus(tC);
     tempValEl.textContent = (tC!=null && !isNaN(tC)) ? tC.toFixed(1) : "—";
-    tempComfortEl.textContent = tempLabel;
-    tempComfortEl.style.color = tempColor;
+    tempComfortEl.textContent = tempStat.label;
+    tempComfortEl.style.color = tempStat.color;
 
-    // إجهاد
     let Fpct = latest.F != null && !isNaN(latest.F) ? Number(latest.F) : 0;
     if(Fpct<0) Fpct=0;
     if(Fpct>100) Fpct=100;
     fatigueNumEl.textContent = Fpct.toFixed(0) + "%";
-
     const circleLen = 314;
     const off = circleLen - (circleLen * (Fpct/100));
     fatigueRingEl.setAttribute("stroke-dashoffset", off.toString());
     fatigueRingEl.setAttribute("stroke", fatigueColor(Fpct));
 
     if(Fpct >= 100){
-        fatigueHintEl.textContent = "إجهادك وصل الحد الأقصى. لازم توقف وتأخذ استراحة الآن.";
+        fatigueHintEl.textContent = "إجهادك وصل 100%. لازم توقف الآن.";
     } else if(Fpct >= 70){
-        fatigueHintEl.textContent = "الإجهاد مرتفع. خذ استراحة قصيرة وخف الضغط.";
+        fatigueHintEl.textContent = "الإجهاد مرتفع. خذ استراحة قصيرة.";
     } else {
         fatigueHintEl.textContent = "وضعك حاليًا مقبول.";
     }
 
-    // تنبيه "قريب من الشاشة" = مسافة أقل من ~45 سم
     const distCm = latest.dist;
     const tooClose = (distCm != null && !isNaN(distCm) && distCm <= 45);
 
-    // اختيار رسالة البانر (banner)
-    // أولوية:
-    // - إجهاد 100% = أحمر
-    // - CO₂ خطر = أحمر
-    // - قريب جداً = أصفر
-    // - إجهاد عالي >=70 = أصفر
-    // - CO₂ تحذير = أصفر
     let bannerMsg = "";
     let bannerClass = "";
 
     if(Fpct >= 100){
-      bannerMsg   = "إجهادك وصل 100%. أوقف فورًا وخذ استراحة.";
+      bannerMsg   = "إجهادك وصل 100%. أوقف وخذ بريك الآن.";
       bannerClass = "bad";
-    } else if (co2Level === "bad"){
-      bannerMsg   = "الهواء سيء جدًا (CO₂ مرتفع). افتح تهوية أو غيّر المكان.";
+    } else if (co2Stat.level === "bad"){
+      bannerMsg   = "الهواء سيء جدًا (CO₂ عالي). افتح تهوية.";
       bannerClass = "bad";
     } else if (tooClose){
-      bannerMsg   = "أنت قريب جدًا من الشاشة. ارجع لورا شوي لتحمي رقبتك وعينيك.";
+      bannerMsg   = "قريب جدًا من الشاشة. ارجع للخلف شوي عشان رقبتك.";
       bannerClass = "warn";
     } else if (Fpct >= 70){
-      bannerMsg   = "الإجهاد مرتفع. خذ استراحة قصيرة الآن.";
+      bannerMsg   = "الإجهاد مرتفع. خذ استراحة قصيرة.";
       bannerClass = "warn";
-    } else if (co2Level === "warn"){
-      bannerMsg   = "جودة الهواء ليست مثالية. جرّب تهوية بسيطة.";
+    } else if (co2Stat.level === "warn"){
+      bannerMsg   = "الهواء مو مثالي. جرّب تفتح تهوية بسيطة.";
       bannerClass = "warn";
     }
 
@@ -768,7 +745,6 @@
     }
   }
 
-  // جدول آخر القراءات
   function renderTable(){
     const rows = latestData.slice(0,10);
     if(!rows.length){
@@ -817,15 +793,10 @@
     }).join("");
   }
 
-  // جلب البيانات من الباك إند
   async function fetchLatest(){
     try {
       const res = await fetch('/api/data?limit=50&device=' + encodeURIComponent(deviceName));
       const arr = await res.json();
-
-      // نوحّد الشكل للواجهة:
-      // نبي مصفوفة عناصر مثل:
-      // { ts, ts_ms, co2, t, F, bpm, dist, presence }
       if(Array.isArray(arr)){
         latestData = arr
           .map(row => {
@@ -854,12 +825,9 @@
     renderTable();
   }
 
-  // أول تشغيل
   fetchLatest();
-
-  // تحديث دوري
   setInterval(()=>{
-    if(autoRefresh){
+    if(refreshToggleEl.classList.contains('active')){
       fetchLatest();
     }
   }, 5000);

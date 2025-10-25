@@ -1,6 +1,4 @@
-import os
-import tempfile
-import time
+import os, tempfile, time, json
 from flask import Flask, jsonify, request, render_template, send_from_directory, abort
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -8,7 +6,7 @@ import firebase_admin
 from firebase_admin import credentials, db
 
 # -------------------------------------------------
-# تحميل المتغيرات من .env (DATABASE_URL , SERVICE_ACCOUNT_JSON ... )
+# تحميل المتغيرات من .env
 # -------------------------------------------------
 load_dotenv()
 
@@ -16,296 +14,261 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 API_TOKEN    = os.getenv("API_TOKEN", "CHANGE_ME_32CHARS")
 PORT         = int(os.getenv("PORT", "5000"))
 
-# مفاتيح Firebase
+# مفاتيح Firebase Admin
 SERVICE_ACCOUNT_JSON = os.getenv("SERVICE_ACCOUNT_JSON")
 SERVICE_ACCOUNT_PATH = os.getenv("SERVICE_ACCOUNT_PATH")
 
 if SERVICE_ACCOUNT_JSON:
-    # لو المفتاح جاي كسلسلة JSON في البيئة
+    # في حال انك حاطة الـ JSON كامل داخل env كسطر
     fd, tmp = tempfile.mkstemp(suffix=".json")
     with os.fdopen(fd, "w", encoding="utf-8") as f:
         f.write(SERVICE_ACCOUNT_JSON)
     cred = credentials.Certificate(tmp)
 elif SERVICE_ACCOUNT_PATH and os.path.exists(SERVICE_ACCOUNT_PATH):
-    # لو المفتاح محفوظ كملف في السيرفر/المشروع
+    # في حال عندك ملف JSON فعلي على السيرفر
     cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
 else:
-    raise RuntimeError("No service account provided")
+    raise RuntimeError("No service account provided (need SERVICE_ACCOUNT_JSON or SERVICE_ACCOUNT_PATH)")
 
 firebase_admin.initialize_app(cred, {"databaseURL": DATABASE_URL})
 
 # -------------------------------------------------
-# تهيئة Flask
+# تكوين Flask
 # -------------------------------------------------
-app = Flask(
-    __name__,
-    template_folder="templates",
-    static_folder="static"
-)
+app = Flask(__name__, template_folder="templates", static_folder="static")
 CORS(app)
 
-# -------------------------------------------------
-# أدوات مساعدة داخلية
-# -------------------------------------------------
-def _ref(path="data"):
-    """Shortcut لعمل db.reference"""
-    return db.reference(path)
-
-def _list_sessions_for_device(device_id: str):
-    """
-    يرجّع كل الجلسات المسجلة لهذا الجهاز من:
-    /data/<device_id>/sessions
-    الشكل المتوقع:
-    {
-      "2025-10-25T12-34-11Z": {
-         "meta": {...},
-         "latest": {...},
-         "readings": {...}
-      },
-      "2025-10-25T11-00-00Z": { ... },
-      ...
-    }
-    """
-    base = f"data/{device_id}/sessions"
-    snap = _ref(base).get() or {}
-    if not isinstance(snap, dict):
-        snap = {}
-    return snap
-
-def _pick_latest_session_key(sessions_dict: dict):
-    """
-    ناخذ آخر جلسة (أحدث مفتاح) بناء على ترتيب مقلوب.
-    مفاتيحك أصلاً معمولة بصيغة وقت ISO-like,
-    فـ sort(reverse=True) يعطي الأحدث أولاً.
-    """
-    if not sessions_dict:
-        return None
-    keys_sorted = sorted(sessions_dict.keys(), reverse=True)
-    return keys_sorted[0] if keys_sorted else None
-
-
-# -------------------------------------------------
-# صفحات الموقع (front-end)
-# -------------------------------------------------
+# =================================================
+#                صفحات HTML
+# =================================================
 
 @app.route("/")
-def home():
-    """
-    الصفحة الرئيسية: داشبورد مباشر للبيانات الحيّة.
-    لازم يكون عندك templates/index.html
-    """
-    return render_template("index.html", title="لوحة GAIDESK")
+def landing():
+    # الصفحة الرئيسية التسويقية (من landing.html)
+    return render_template("landing.html", title="GAIDESK")
+
+@app.route("/live")
+def live_page():
+    # المراقبة الحية من الجهاز
+    return render_template("live.html", title="المراقبة الآن")
 
 @app.route("/session")
 def session_page():
-    """
-    صفحة ملخص آخر جلسة.
-    لازم يكون عندك templates/session.html
-    """
+    # ملخص آخر جلسة
     return render_template("session.html", title="ملخص الجلسة")
 
 @app.route("/about")
 def about_page():
-    """
-    صفحة تعريف بالمنتج.
-    لازم يكون عندك templates/about.html
-    """
+    # صفحة "عن المشروع / عني"
     return render_template("about.html", title="عن GAIDESK")
 
-# -------------------------------------------------
-# REST API
-# -------------------------------------------------
+# صفحة توثيق الـ API (اختياري: لو تبين تخلينه، أو ممكن تحذفين الراوت هذا)
+@app.route("/api-docs")
+def api_docs():
+    return render_template("api.html", title="توثيق API")
+
+
+# =================================================
+#                دوال مساعدة
+# =================================================
+
+def _ref(path="data"):
+    """اختصار للوصول الى db.reference(path)"""
+    return db.reference(path)
+
+def _session_root(device_id: str, session_key: str):
+    """
+    يرجّع المسارات الكاملة لجلسة وحدة داخل الـ Realtime DB:
+    /data/<device>/sessions/<session_key>/{latest,meta,readings}
+    """
+    base = f"data/{device_id}/sessions/{session_key}"
+    return {
+        "base": base,
+        "latest": base + "/latest",
+        "meta": base + "/meta",
+        "readings": base + "/readings",
+    }
+
+
+# =================================================
+#                REST API
+# =================================================
 
 @app.route("/api/data")
 def api_data():
     """
-    يعيد آخر القراءات (افتراضي 50).
-    باراميترات (اختيارية):
-      ?limit=25
-      ?device=GAIDESK-01
-
-    الهدف: هذه الداتا تروح للواجهة الرئيسية (index.html)
-    عشان:
-    - نعرض وجود المستخدم
-    - F (الإجهاد)
-    - CO₂
-    - الحرارة
-    - المسافة
-    - الخ...
-
-    ملاحظة مهمة:
-    الـ ESP32 يحفظ القراءات داخل:
-      /data/<device>/sessions/<sessionKey>/readings/<timestamp> : {...}
-    فإحنا بناخذ "آخر جلسة" لهذا الجهاز ونرجع القراءات من هناك.
+    ترجع آخر القراءات (افتراضي 50) من المسار:
+      /data/<device>/sessions/<last_session>/readings/*
+    أو fallback من /data/<device>/latest
+    - باراميتر:
+        ?limit=25
+        &device=GAIDESK-01
+    شكل كل عنصر في الـ JSON:
+    [
+      {
+        "ts": 1730000000000,  <-- timestamp من الجهاز
+        "co2": 800,
+        "t": 24.5,
+        "F": 32,
+        "bpm": 14.2,
+        "dist": 52,
+        "presence": 1
+      },
+      ...
+    ]
     """
-    # كم عنصر نبغى
-    limit = request.args.get("limit", "50")
-    try:
-        limit = int(limit)
-    except:
-        limit = 50
-    limit = max(1, min(limit, 200))
+    limit = max(1, min(int(request.args.get("limit", 50)), 200))
+    device = request.args.get("device", "GAIDESK-01")
 
-    # أي جهاز؟
-    device_id = request.args.get("device", "GAIDESK-01")
+    dev_ref = _ref(f"data/{device}")
+    dev_data = dev_ref.get() or {}
 
-    # نجيب كل الجلسات الخاصة بهذا الجهاز
-    sessions_dict = _list_sessions_for_device(device_id)
-
-    # إذا مافي جلسات -> رجعي مصفوفة فاضية
-    if not sessions_dict:
-        return jsonify([])
-
-    # اختاري آخر جلسة
-    last_key = _pick_latest_session_key(sessions_dict)
-    if not last_key:
-        return jsonify([])
-
-    last_session = sessions_dict.get(last_key, {})
-    readings = last_session.get("readings", {})
-
-    # structure المتوقع:
-    # readings = {
-    #   "1698956278532": {
-    #       "t": 25.8,
-    #       "co2": 500,
-    #       "F": 32,
-    #       "presence": 1,
-    #       "bpm": 18.4,
-    #       "dist": 50,
-    #       "session_start_ts": 1700000000000,
-    #       "ts": {".sv": "timestamp"}  <-- أو timestamp فعلي لو ESP هو اللي حطّه
-    #   },
-    #   ...
-    # }
-
-    # نرتب بالمفتاح (timestamps كـ string) تنازليًا
-    # ثم نقص limit
-    items = []
-    if isinstance(readings, dict):
-        for k in sorted(readings.keys(), reverse=True):
-            v = readings[k] or {}
-            # نوحّد الـtimestamp
-            # لو فيه ts كرقم جاهز (ms) خليه، لو ما فيه بنحاول ناخذ k
-            ts_val = None
-            raw_ts = v.get("ts")
-            # أحياناً ts يكون dict { ".sv": "timestamp" } -> ما ينفع
-            if isinstance(raw_ts, (int, float)):
-                ts_val = int(raw_ts)
-            else:
-                # جرّبي نقلب المفتاح نفسه إلى int
-                try:
-                    ts_val = int(k)
-                except:
-                    ts_val = None
-
-            items.append({
-                "key": k,
-                "value": {
+    # نحاول ناخذ أحدث جلسة
+    sessions = dev_data.get("sessions", {})
+    if isinstance(sessions, dict) and sessions:
+        # آخر جلسة على حسب المفتاح (المفتاح غالباً ISO timestamp)
+        session_keys = sorted(sessions.keys(), reverse=True)
+        last_session_key = session_keys[0]
+        readings = sessions.get(last_session_key, {}).get("readings", {})
+        # readings تحتها push keys (timestamps من الجهاز)
+        # نقلبها لأجدد أولاً
+        items = []
+        for rk, payload in readings.items():
+            if isinstance(payload, dict):
+                # نزبط الـ timestamp:
+                # لو فيه ts[".sv"]="timestamp" لازم نحاول نجيب "ts" اللي هو رقم
+                ts_val = payload.get("ts")
+                if isinstance(ts_val, dict):
+                    ts_val = None  # هذا يعني الـ .sv من Firebase
+                items.append({
                     "ts": ts_val,
-                    "co2": v.get("co2"),
-                    "t": v.get("t"),
-                    "F": v.get("F"),
-                    "presence": v.get("presence"),
-                    "bpm": v.get("bpm"),
-                    "dist": v.get("dist"),
-                    # نخلي session_start_ts لو ودك تعرضينه لاحقاً
-                    "session_start_ts": v.get("session_start_ts"),
-                }
-            })
+                    "co2": payload.get("co2"),
+                    "t": payload.get("t"),
+                    "F": payload.get("F"),
+                    "bpm": payload.get("bpm"),
+                    "dist": payload.get("dist"),
+                    "presence": payload.get("presence"),
+                })
+        # نفرز حسب ts (الأجدد أول)
+        # لو ts مفقود نخليه 0 عشان يطلع آخر الجدول
+        items.sort(key=lambda x: x["ts"] if x["ts"] else 0, reverse=True)
+        items = items[:limit]
 
-    # خذي فقط limit
-    items = items[:limit]
+        return jsonify(items)
 
-    return jsonify(items)
+    # ما فيه sessions؟ نطيح على /data/<device>/latest
+    latest_payload = dev_data.get("latest", {})
+    if isinstance(latest_payload, dict) and latest_payload:
+        ts_val = latest_payload.get("ts")
+        if isinstance(ts_val, dict):
+            ts_val = None
+        item = {
+            "ts": ts_val,
+            "co2": latest_payload.get("co2"),
+            "t": latest_payload.get("t"),
+            "F": latest_payload.get("F"),
+            "bpm": latest_payload.get("bpm"),
+            "dist": latest_payload.get("dist"),
+            "presence": latest_payload.get("presence"),
+        }
+        return jsonify([item])
+
+    # لا جلسة ولا latest
+    return jsonify([])
 
 
 @app.route("/api/session-summary")
 def api_session_summary():
     """
-    يرجع meta لأحدث جلسة منتهية/موجودة.
-    هذه الداتا تُستخدم في صفحة /session لعرض الملخص.
-
-    ESP32 يرسل meta هنا:
-      /data/<device>/sessions/<sessionKey>/meta
-
-    شكل meta (من الكود حقك):
+    يرجع meta لأحدث جلسة:
     {
-      "start_ts": <ms>,
-      "start_iso": "...",
-      "end_ts": <ms>,
-      "end_iso": "...",
-      "duration_sec": 1234,
-      "alerts": {
-        "near":  0,
-        "co2":   0,
-        "warn1": 0,
-        "warn2": 0
-      },
-      "stats": {
-        "dist": { "min":..,"avg":..,"max":.. },
-        "co2":  {...},
-        "temp": {...},
-        "risk": {...},
-        "F":    {...},
-        "bpm":  {...}
-      },
-      "device": "GAIDESK-01",
-      "final_state": "SUMMARY",
-      "session_key": "2025-10-25T12-34-11Z",
-      "status": "ended",
-      "updated_ts": {".sv": "timestamp"}
+      "session_key": "...",
+      "start_iso": "2025-10-25T12:00:00Z",
+      "end_iso":   "2025-10-25T13:10:00Z",
+      "duration_sec": 4200,
+      "alerts": {...},
+      "stats":   {...}
     }
+    */
     """
-    device_id = request.args.get("device", "GAIDESK-01")
+    device = request.args.get("device", "GAIDESK-01")
 
-    # احصل على كل الجلسات
-    sessions_dict = _list_sessions_for_device(device_id)
-    if not sessions_dict:
-        return jsonify({"error": "no sessions", "device": device_id}), 404
+    dev_ref = _ref(f"data/{device}")
+    dev_data = dev_ref.get() or {}
 
-    # خذ آخر جلسة
-    latest_key = _pick_latest_session_key(sessions_dict)
-    if not latest_key:
-        return jsonify({"error": "no session key", "device": device_id}), 404
+    sessions = dev_data.get("sessions", {})
+    if not (isinstance(sessions, dict) and sessions):
+        return jsonify({"error": "no sessions"}), 404
 
-    session_node = sessions_dict.get(latest_key, {})
-    meta = session_node.get("meta", {})
+    session_keys = sorted(sessions.keys(), reverse=True)
+    last_key = session_keys[0]
+    meta = sessions.get(last_key, {}).get("meta", {})
 
-    # لو مافي meta -> نرجع info بسيط
-    if not meta:
-        return jsonify({
-            "device": device_id,
-            "session_key": latest_key,
-            "error": "no meta"
-        })
+    # نضمن مفاتيح مهمة لو ناقصة
+    resp = {
+        "device": device,
+        "session_key": last_key,
+        "start_iso": meta.get("start_iso"),
+        "end_iso": meta.get("end_iso"),
+        "duration_sec": meta.get("duration_sec"),
+        "status": meta.get("status"),
+        "alerts": meta.get("alerts", {}),
+        "stats":  meta.get("stats", {}),
+        "final_state": meta.get("final_state"),
+    }
 
-    # انسخي الـ meta نفسه + session_key + device
-    meta_out = dict(meta)
-    meta_out["device"] = device_id
-    meta_out["session_key"] = latest_key
+    return jsonify(resp)
 
-    # زيادة سلامة: duration_sec لو مو موجودة
-    if "duration_sec" not in meta_out:
-        # نحاول نحسبها لو فيه start_ts/end_ts بالميلي ثانية
-        st_ms = meta_out.get("start_ts")
-        en_ms = meta_out.get("end_ts")
-        if isinstance(st_ms, (int, float)) and isinstance(en_ms, (int, float)):
-            dur_s = int( (en_ms - st_ms) / 1000 )
-        else:
-            dur_s = None
-        meta_out["duration_sec"] = dur_s
 
-    return jsonify(meta_out)
+@app.route("/api/devices")
+def api_devices():
+    """
+    ترجع قائمة الأجهزة اللي عندنا تحت /data/*
+    إذا ما قدرنا نقرأ البنية، نرجع ["GAIDESK-01"] عشان ما نكسر الواجهة
+    """
+    snap = _ref("data").get() or {}
+    if not isinstance(snap, dict):
+        return jsonify(["GAIDESK-01"])
+
+    names = []
+    for k,v in snap.items():
+        # نتأكد انه dict وفيه sessions او latest (يعني شكله جهاز)
+        if isinstance(v, dict) and ("sessions" in v or "latest" in v):
+            names.append(k)
+
+    if not names:
+        names = ["GAIDESK-01"]
+
+    names.sort()
+    return jsonify(names)
 
 
 @app.route("/api/post", methods=["POST"])
 def api_post():
     """
-    (نفس الفكرة الأصلية)
-    يستقبل قراءة من الجهاز (ESP32) باستخدام Bearer token.
-    يخزنها في Firebase.
+    هذا هو الـ endpoint اللي الجهاز (ESP32) يستعمله عشان يرسل القياسات.
+    الحماية: لازم Authorization: Bearer <API_TOKEN>
+    الـ JSON اللي يرسله الجهاز مثلاً:
+    {
+      "device": "GAIDESK-01",
+      "t": 24.5,
+      "co2": 800,
+      "F": 32,
+      "bpm": 14.2,
+      "dist": 52,
+      "presence": 1,
+      "ts": 1730000000000
+    }
+
+    احنا هنا نحفظ:
+      - /data/<device>/latest        (PUT)
+      - /data/<device>/sessions/<session_key>/latest (PUT)
+      - /data/<device>/sessions/<session_key>/readings (POST / push)
+    مع ملاحظة إن الـ ESP32 في كوده أصلاً يرسلها بنفسه مباشرة للـ Firebase.
+    فهذي الراوت مفيدة لو تبغين ترسلي داتا من محاكي/اختبار.
     """
+
+    # تحقق من التوكن
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
         return jsonify({"error": "missing bearer token"}), 401
@@ -316,19 +279,30 @@ def api_post():
     if not isinstance(payload, dict):
         return jsonify({"error": "invalid json"}), 400
 
-    # الجهاز المرسل
     device = payload.pop("device", "GAIDESK-01")
-    # نخزن القراءة تحت data/<device>/{timestamp}:payload
+    # نستخدم ms timestamp كـ key فريد في readings
     key = str(int(time.time() * 1000))
 
-    _ref(f"data/{device}").child(key).set(payload)
+    # نحط نسخة تحت /data/<device>/latest
+    _ref(f"data/{device}/latest").set(payload)
+
+    # ولو فيه session_key بالبايلود نقدر نضيفها تحت /sessions/<...>
+    session_key = payload.get("session_key")
+    if session_key:
+        root = _session_root(device, session_key)
+
+        # latest في الجلسة
+        _ref(root["latest"]).set(payload)
+
+        # readings (push-like)
+        _ref(root["readings"]).child(key).set(payload)
 
     return jsonify({"ok": True, "device": device, "key": key})
 
 
-# -------------------------------------------------
-# ملفات ثابتة (favicon) + أخطاء
-# -------------------------------------------------
+# =================================================
+#               Static Extras
+# =================================================
 
 @app.route("/favicon.ico")
 def favicon():
@@ -338,21 +312,24 @@ def favicon():
         return send_from_directory(p, "favicon.ico", mimetype="image/x-icon")
     abort(404)
 
+
+# =================================================
+#               Error handlers
+# =================================================
+
 @app.errorhandler(404)
 def not_found(e):
-    # صفحة 404 بسيطة (لو حبيتي تعملي 404.html لاحقاً)
-    return render_template("404.html", title="غير موجود") if os.path.exists(os.path.join(app.template_folder,"404.html")) \
-        else ("الصفحة غير موجودة", 404)
+    return render_template("404.html", title="غير موجود"), 404
 
 @app.errorhandler(500)
 def err500(e):
-    return render_template("500.html", title="خطأ داخلي") if os.path.exists(os.path.join(app.template_folder,"500.html")) \
-        else ("خطأ داخلي في السيرفر", 500)
+    return render_template("500.html", title="خطأ داخلي"), 500
 
-# -------------------------------------------------
-# تشغيل محلي
-# -------------------------------------------------
+
+# =================================================
+#               تشغيل السيرفر
+# =================================================
+
 if __name__ == "__main__":
-    # على جهازك المحلي:
-    # http://localhost:5000
+    # host=0.0.0.0 عشان يشتغل على Render / Ngrok / أي سيرفر عام
     app.run(host="0.0.0.0", port=PORT, debug=False)
