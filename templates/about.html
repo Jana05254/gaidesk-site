@@ -1,146 +1,126 @@
 {% extends "base.html" %}
 {% block content %}
 
-<style>
-.about-wrap {
-  max-width: 1000px;
-  margin: 2rem auto 4rem;
-  padding: 2rem 1.5rem;
-  background: #fff;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(0,0,0,0.05);
-  box-shadow: var(--shadow-card);
-}
+<section class="section-wrapper">
+  <div class="section-head">
+    <h1 class="section-title">ما هو GAIDESK؟</h1>
+    <p class="section-desc">
+      GAIDESK هو جهاز مكتبي ذكي يراقب وضع الجلوس، نمط التنفس، القرب من الشاشة،
+      جودة الهواء في محيط العمل، ومستوى الإرهاق البدني المتراكم أثناء الجلسة.
+      الغاية ليست تتبّعك، بل حمايتك من الإجهاد الصامت الذي لا تلاحظه قبل فوات الأوان.
+    </p>
+  </div>
+</section>
 
-.about-head {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-.about-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--accent-dark);
-  margin: 0 0 .5rem;
-}
-.about-sub {
-  color: var(--text-dim);
-  font-size: .9rem;
-  line-height: 1.6;
-  max-width: 48ch;
-  margin: 0 auto;
-  text-align:center;
-}
+<section class="section-wrapper">
+  <div class="why-grid">
+    <!-- المشكلة -->
+    <div class="info-card">
+      <div class="info-title">المشكلة</div>
+      <div class="info-desc">
+        العمل الطويل أمام الشاشات يفرض ضغطاً جسدياً مستمراً:
+        انحناء الرقبة والظهر، قرب مضر من الشاشة، نقص جودة الهواء، واحتباس النفس
+        أثناء التركيز العميق. هذه العوامل لا تُشعرك بالخطر فوراً، لكنها تؤدي إلى ألم مزمن،
+        إرهاق معرفي، وتراجع في جودة الإنتاج على المدى المتوسط.
+      </div>
+    </div>
 
-.about-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(min(300px,100%),1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-.about-card {
-  background: var(--bg-soft);
-  border: 1px solid rgba(0,0,0,0.05);
-  box-shadow: var(--shadow-card);
-  border-radius: var(--radius-md);
-  padding: 1rem 1rem 1.25rem;
-  font-size: .85rem;
-  line-height: 1.6;
-  color: var(--text-main);
-}
-.about-card-title {
-  font-size: .9rem;
-  font-weight: 600;
-  color: var(--accent-dark);
-  margin-bottom: .4rem;
-}
+    <!-- ما الذي يقدّمه الجهاز -->
+    <div class="info-card">
+      <div class="info-title">الحل الذي يقدّمه الجهاز</div>
+      <div class="info-desc">
+        بدلاً من مؤقّت زمني يطلب منك الاستراحة كل فترة ثابتة،
+        يقوم GAIDESK بتحليل وضعك الفعلي لحظة بلحظة.  
+        عند ظهور مؤشرات إجهاد مرتفع أو وضعية جلوس غير صحية،
+        يصدر تنبيهاً فورياً ويقترح استراحة قصيرة قبل الوصول إلى مرحلة الإنهاك.
+        بهذه الطريقة، تحصل على استراحة فقط عندما يكون جسدك بحاجة حقيقية إليها.
+      </div>
+    </div>
 
-.about-foot {
-  text-align: center;
-  font-size: .8rem;
-  color: var(--text-dim);
-  line-height: 1.6;
-}
-.me-badge {
-  display: inline-block;
-  background: rgba(203,183,156,0.1);
-  border: 1px solid rgba(203,183,156,0.5);
-  border-radius: 999px;
-  color: var(--accent-dark);
-  padding: .4rem .75rem;
-  font-weight: 500;
-  font-size: .8rem;
-  margin-top: 1rem;
-  box-shadow: 0 20px 40px rgba(203,183,156,0.3);
-}
-.me-badge a {
-  text-decoration: none;
-  color: var(--accent-dark);
-}
-.me-badge a:hover {
-  text-decoration: underline;
-}
-</style>
+    <!-- كيف يعمل -->
+    <div class="info-card">
+      <div class="info-title">كيف يعمل</div>
+      <div class="info-desc">
+        يجمع الجهاز عدداً من الإشارات الحيوية والسلوكية:
+        المسافة عن الشاشة، الاستقرار أو الحركة الدقيقة في الجذع،
+        نمط التنفّس، جودة الهواء (مثل مستوى ثاني أكسيد الكربون)،
+        وحرارة البيئة.  
+        ثم يبني مؤشراً تدريجياً للإجهاد (Fatigue %) يمثل الحمل الفعلي على جسدك.
+        عند وصول هذا المؤشر إلى مستوى مرتفع، يطلب منك الجهاز التوقّف فوراً.
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="about-wrap">
-  <div class="about-head">
-    <h1 class="about-title">ليش سويت GAIDESK؟</h1>
-    <p class="about-sub">
-      أغلب الأدوات بس تذكّرك تقوم كل 30 دقيقة.
-      طيب لو أنت بخير فعلاً؟ أو لو جسدك تعب بعد 7 دقايق مو 30؟
-      GAIDESK مو تايمر. GAIDESK يراقب جسمك نفسه.
+<section class="section-wrapper">
+  <div class="section-head">
+    <h2 class="section-title">لمن صُمّم GAIDESK؟</h2>
+    <p class="section-desc">
+      صُمّم GAIDESK خصيصاً للأشخاص الذين يعملون بتركيز عالٍ لساعات طويلة،
+      وغالباً لا يلاحظون الإرهاق إلا بعد فوات الوقت.
     </p>
   </div>
 
-  <div class="about-grid">
-
-    <div class="about-card">
-      <div class="about-card-title">جسمك أولاً</div>
-      GAIDESK يسجل وضعيتك، تنفسك، بعدك عن الشاشة، وجودك على المكتب،
-      وحتى جودة الهواء حوالينك.
-      مو بس “جلست كثير”.
+  <div class="audience-grid">
+    <div class="aud-card">
+      <div class="aud-head">العمل العميق لساعات متواصلة</div>
+      <div class="aud-body">
+        مطوّرون، باحثون، طلاب في فترات الاستعداد المكثّف.
+        هذه الفئة قادرة على تجاهل التعب الجسدي تماماً عندما تكون في حالة تركيز.
+        GAIDESK يعمل كطبقة حماية صحية موازية للتركيز.
+      </div>
     </div>
 
-    <div class="about-card">
-      <div class="about-card-title">تنبيه ذكي مو مزعج</div>
-      التنبيه ما يطلع لأن المؤقّت خلص،
-      التنبيه يطلع لما جسمك بدأ ينهار:
-      تنفس سريع؟ قربت كثير من الشاشة؟ CO₂ خانق؟
-      هنا يقولك: “قف. خذ بريك”.
-    </div>
-
-    <div class="about-card">
-      <div class="about-card-title">مفيد للي ينسون نفسهم</div>
-      ناس الـhyperfocus (مبرمجين، طلاب، مصممين، ADHD…)
-      يقدرون يجلسون ساعات بدون ما يحسون بالتعب إلا متأخر.
-      GAIDESK يصير الوعي البدني اللي أنت ما تنتبه له وانت مندمج.
-    </div>
-
-    <div class="about-card">
-      <div class="about-card-title">مو هدفه يخوّفك</div>
-      مو الفكرة "أنت غلط".
-      الفكرة "جسمك قاعد يطيح الآن".
-      خذ بريك، رجّع نفسك طبيعي، وارجع.
-      الجلسات تصير أذكى، مو أطول.
-    </div>
-
-  </div>
-
-  <div class="about-foot">
-    <div>GAIDESK جهاز + سوفتوير هدفه يحمي صحتك بدون ما يزعجك كل شوي.</div>
-    <div class="me-badge">
-      صنع بحب بواسطة جنا خلبان —
-      <a href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    <div class="aud-card">
+      <div class="aud-head">العمل المكتبي اليومي</div>
+      <div class="aud-body">
+        الموظفون الذين يقضون وقتاً طويلاً أمام الحاسوب أو في بيئة مكتبية مغلقة.
+        متابعة جودة الهواء، وضعية الجلوس، والضغط الجسدي المستمر
+        تساعد في تقليل الصداع، الشد العضلي، وتشتت الانتباه آخر اليوم.
+      </div>
     </div>
   </div>
+</section>
 
-  <div style="text-align:center; margin-top:2rem;">
-    <a class="btn-primary" href="{{ url_for('devices_page') }}" style="margin-left:.5rem;">
-      جرّب المراقبة الآن
-    </a>
-    <a class="btn-ghost" href="{{ url_for('landing') }}">
-      رجوع للرئيسية
-    </a>
+<section class="section-wrapper">
+  <div class="section-head">
+    <h2 class="section-title">رسالة التصميم</h2>
+    <p class="section-desc">
+      تم تطوير GAIDESK بهدف واضح: جعل بيئة العمل أكثر إنسانية.
+      الفكرة ليست زيادة الإنتاجية بأي ثمن، بل حماية الجسد من الإجهاد المتراكم
+      الذي يُستنزف بصمت.  
+      يهدف المشروع إلى خلق توازن بين الأداء العالي والاستمرارية الصحية،
+      بحيث يستطيع المستخدم تقديم عمل عميق ومركّز دون التضحية براحته الجسدية
+      أو صحته على المدى البعيد.
+    </p>
+    <p class="section-desc">
+      تم تطوير GAIDESK بواسطة <strong>Jana</strong>.  
+      للمزيد من المعلومات المهنية:
+      <a class="footer-link" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+        LinkedIn
+      </a>
+    </p>
   </div>
-</div>
+</section>
+
+<section class="section-wrapper">
+  <div class="card-soft cta-card">
+    <div class="cta-main">
+      <div class="cta-text">جرّب لوحة المراقبة</div>
+      <div class="cta-sub">
+        يمكنك الاطّلاع مباشرة على المؤشرات الحيوية للجلسة الحالية
+        وعلى ملخص الجلسة الأخيرة المسجّلة.
+      </div>
+    </div>
+    <div class="cta-ctaBtns">
+      <a class="btn-primary" href="{{ url_for('devices_page') }}">
+        لوحة المراقبة
+      </a>
+      <a class="btn-ghost" href="{{ url_for('session_page') }}">
+        ملخص الجلسة
+      </a>
+    </div>
+  </div>
+</section>
 
 {% endblock %}

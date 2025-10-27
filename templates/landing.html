@@ -1,60 +1,58 @@
 {% extends "base.html" %}
 {% block content %}
 
-<!-- HERO SECTION -->
+<!-- HERO / MAIN SECTION -->
 <section class="hero-section">
-
   <div class="hero-content card-soft">
 
-    <!-- العمود الأيسر: النص -->
+    <!-- العمود الأيسر: الشعار + النص + الأزرار -->
     <div class="hero-left">
 
-      <!-- لوقو كبير وسط -->
+      <!-- شعار كبير في الوسط -->
       <div class="hero-logo-block">
         <div class="hero-logo-circle">
           <span class="hero-logo-text">GAIDESK</span>
         </div>
       </div>
 
-      <!-- العنوان التسويقي -->
+      <!-- العنوان -->
       <h1 class="hero-title main-headline">
-        مساعد مكتب ذكي يراقب صحتك ويُحسّن أداءك.
+        مساعد مكتبي ذكي يراقب صحتك أثناء العمل ويحمي أداءك على المدى الطويل.
       </h1>
 
-      <!-- الوصف التسويقي -->
+      <!-- الوصف التسويقي المختصر -->
       <p class="hero-desc">
-        GAIDESK يتابع جلستك، تنفسك، قربك من الشاشة، وجود جسمك على المكتب، وجودة الهواء حولك.
-        عند ظهور مؤشرات إرهاق أو وضع غير صحي، الجهاز يتدخل فورًا لينبّهك ويقترح عليك استراحة قصيرة
-        قبل أن يتحول الإرهاق إلى ألم مزمن أو تشتت دائم.
+        GAIDESK يتابع جلستك، تنفّسك، قربك من الشاشة، وجود جسمك على المكتب، وجودة الهواء من حولك.
+        عند ظهور مؤشرات إجهاد حقيقي أو وضع غير صحي، ينبهك فورًا ويقترح استراحة قصيرة قبل أن يتحول
+        الإرهاق إلى ألم مستمر أو تراجع في التركيز.
       </p>
 
-      <!-- CTA -->
+      <!-- أزرار الدعوة -->
       <div class="hero-cta">
         <a class="btn-primary large" href="{{ url_for('devices_page') }}">
-          راقب الجلسة الآن
+          فتح لوحة المراقبة
         </a>
         <a class="btn-ghost" href="{{ url_for('about_page') }}">
-          ما هو GAIDESK؟
+          عن المشروع
         </a>
       </div>
 
-      <!-- حالة الاتصال (تظهر من الـ JS فقط إذا في بيانات حية) -->
+      <!-- حالة الاتصال: تظهر فقط إذا في بيانات مباشرة -->
       <div class="hero-note device-online" style="display:none;">
         <span class="dot-status dot-ok"></span>
-        <span>الجهاز متصل الآن ويرسل قراءات حقيقية.</span>
+        <span>الجهاز نشط حاليًا ويرسل قراءات مباشرة.</span>
       </div>
 
     </div>
 
-    <!-- العمود الأيمن: معاينة حية مبسطة -->
+    <!-- العمود الأيمن: بطاقة المعاينة المباشرة -->
     <div class="live-preview-card">
       <div class="live-header">
-        <div class="live-title">القياسات الحية</div>
+        <div class="live-title">قياسات مباشرة</div>
         <div class="live-device" id="liveDeviceLabel">GAIDESK</div>
       </div>
 
       <div class="live-grid">
-
         <div class="live-item">
           <div class="live-label">درجة الحرارة</div>
           <div class="live-value" id="liveTemp">--°C</div>
@@ -62,7 +60,7 @@
         </div>
 
         <div class="live-item">
-          <div class="live-label">الجودة الهوائية (CO₂)</div>
+          <div class="live-label">جودة الهواء (CO₂)</div>
           <div class="live-value"><span id="liveCO2">ppm --</span></div>
           <div class="live-sub" id="liveCO2Note">الهواء جيد</div>
         </div>
@@ -74,121 +72,48 @@
         </div>
 
         <div class="live-item">
-          <div class="live-label">مؤشر الإرهاق اللحظي</div>
+          <div class="live-label">مؤشر الإجهاد الحالي</div>
           <div class="live-fatigue-wrapper">
             <div class="fatigue-circle">
               <span class="fatigue-num" id="liveFatigueNum">0%</span>
             </div>
             <div class="live-sub" id="liveFatigueNote">
-              آمن الآن. الجهاز سيتدخل قبل أن يتفاقم الإجهاد.
+              في النطاق الآمن. سيتم التنبيه قبل وصول الإرهاق لمرحلة خطرة.
             </div>
           </div>
         </div>
-
-      </div><!-- /live-grid -->
+      </div>
 
       <div class="live-footer">
         <div class="tip">
-          هذا جزء من القراءات التي يجمعها GAIDESK بشكل مباشر من مكتبك، ليمنع الإرهاق قبل أن يبدأ.
+          هذه القياسات تُجمع في اللحظة من بيئتك ومن سلوك الجلوس لديك، بهدف الوقاية المبكرة من الإرهاق.
         </div>
         <a class="see-full" href="{{ url_for('devices_page') }}">
-          عرض لوحة المراقبة الكاملة →
+          عرض التفاصيل الكاملة →
         </a>
       </div>
+    </div>
 
-    </div><!-- /live-preview-card -->
-
-  </div><!-- /hero-content card-soft -->
-</section>
-
-
-<!-- WHY SECTION -->
-<section class="section-wrapper">
-  <div class="section-head">
-    <h2 class="section-title">لماذا أحتاج هذا الجهاز؟</h2>
-    <p class="section-desc">
-      الجلوس الطويل، التركيز العميق، الهواء المغلق، والإجهاد الصامت… كلها عوامل تضع ضغطًا حقيقيًا
-      على جسدك دون أن تشعر. GAIDESK صُمّم ليكون يقظًا بدلًا عنك، ويعيدك إلى وضع صحي قبل فوات الأوان.
-    </p>
   </div>
-
-  <div class="why-grid">
-
-    <div class="info-card">
-      <div class="info-title">يراقب الجلسة والتنفس</div>
-      <div class="info-desc">
-        يتابع وضعك، مسافة وجهك عن الشاشة، نمط تنفسك، وإشارات الإجهاد البدني.
-        ليس تنبيهًا زمنيًا عشوائيًا؛ بل يعتمد على حالة جسمك الفعلية.
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-title">ينبّهك في اللحظة الصحيحة</div>
-      <div class="info-desc">
-        عند ارتفاع المؤشرات الخطرة (قرب شديد من الشاشة، تنفس مضطرب، مستوى إجهاد مرتفع)
-        يطلب منك استراحة ذكية قصيرة، بدل أن تنتظر حتى تشعر بالألم المتأخر.
-      </div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-title">يحافظ على إنتاجيتك</div>
-      <div class="info-desc">
-        الفكرة ليست أن تتوقف كل خمس دقائق. الفكرة أن تمنع الانهيار.
-        جهازك يساعدك أن تعمل بتركيز واضح ومدى أطول، لكن بأمان.
-      </div>
-    </div>
-
-  </div><!-- /why-grid -->
 </section>
 
-
-<!-- AUDIENCE SECTION -->
-<section class="section-wrapper">
-  <div class="section-head">
-    <h2 class="section-title">مَن المستفيد؟</h2>
-    <p class="section-desc">
-      GAIDESK مناسب لكل من يعمل فترات طويلة أمام الشاشة أو ينسى العناية بجسده أثناء التركيز.
-    </p>
-  </div>
-
-  <div class="audience-grid">
-
-    <div class="aud-card">
-      <div class="aud-head">الأشخاص ذوو التركيز العميق</div>
-      <div class="aud-body">
-        مبرمجون، باحثون، طلاب يستعدّون لاختبارات مهمّة… أشخاص يمكنهم أن ينسوا الوقت
-        تمامًا. الجهاز يُبقي الجسد في الصورة حتى لو العقل كان مشغولًا بالكامل بالعمل.
-      </div>
-    </div>
-
-    <div class="aud-card">
-      <div class="aud-head">العمل المكتبي الطويل</div>
-      <div class="aud-body">
-        موظفو مكاتب، مستخدمو الحاسوب لساعات متواصلة، العاملون عن بُعد.
-        الجهاز يراقب جودة الهواء، مستوى التوتر الجسدي، ويمنع الإجهاد من التراكم بصمت.
-      </div>
-    </div>
-
-  </div><!-- /audience-grid -->
-</section>
-
-
-<!-- CTA / CALL TO ACTION -->
+<!-- CTA سريعة في النهاية -->
 <section class="section-wrapper">
   <div class="card-soft cta-card">
     <div class="cta-main">
-      <div class="cta-text">ابدأ في متابعة جلساتك الآن</div>
+      <div class="cta-text">جاهز لبدء المتابعة؟</div>
       <div class="cta-sub">
-        يمكنك مشاهدة آخر جلسة، مؤشرات الإجهاد (Fatigue)، جودة الهواء، ووقت الجلوس،
-        مباشرة من الويب.
+        لوحة المراقبة تعرض لك مؤشرات الإجهاد، جودة الهواء، ومدة الجلسة الحالية.  
+        كما يمكنك الاطّلاع على ملخص آخر جلسة.
       </div>
     </div>
+
     <div class="cta-ctaBtns">
       <a class="btn-primary" href="{{ url_for('devices_page') }}">
-        فتح لوحة المراقبة
+        لوحة المراقبة
       </a>
       <a class="btn-ghost" href="{{ url_for('session_page') }}">
-        ملخص الجلسة الأخيرة
+        ملخص الجلسة
       </a>
     </div>
   </div>
