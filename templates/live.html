@@ -1,837 +1,457 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>GAIDESK Live Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مراقبة الآن | GAIDESK</title>
 
-<style>
-  :root {
-    --bg-page: #eef4ef;
-    --panel-bg: #ffffff;
-    --panel-border: rgba(43,36,26,.08);
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    --brand-main: #6d5a3e;
-    --brand-dark: #2b241a;
-    --mint-soft: #e9f3e9;
-    --ok: #5b7f4a;
-    --warn: #c4a36b;
-    --bad: #b64e42;
+  <!-- ألوان الهوية -->
+  <style>
+    :root {
+      --bg-main: #f5faf4;        /* أخضر شفاف فاتح جدا */
+      --panel:   #eef5ee;        /* بانيل خفيف */
+      --text-main:#1f2922;       /* نص غامق مائل أخضر */
+      --accent:  #8f6a3b;        /* الذهبي البني حق الشعار */
+      --danger:  #b94a4a;
+      --ok:      #1f7a4a;
+    }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", "Noto Sans Arabic", sans-serif;
+    }
+    .glass-card {
+      background-color: var(--panel);
+      backdrop-filter: blur(8px);
+      box-shadow:
+        0 20px 40px rgba(0,0,0,.07),
+        0 1px 1px rgba(0,0,0,.04);
+      border-radius: 1rem;
+      border: 1px solid rgba(0,0,0,.04);
+    }
+    .section-title {
+      font-size: .8rem;
+      color: rgba(31,41,34,.55);
+      font-weight: 500;
+      letter-spacing: -.02em;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .badge-soft {
+      background-color: rgba(31,122,74,.08);
+      color: var(--ok);
+      font-size: .7rem;
+      padding: .25rem .5rem;
+      border-radius: .4rem;
+      line-height: 1rem;
+      font-weight: 500;
+    }
+    .badge-warn {
+      background-color: rgba(185,74,74,.08);
+      color: var(--danger);
+      font-size: .7rem;
+      padding: .25rem .5rem;
+      border-radius: .4rem;
+      line-height: 1rem;
+      font-weight: 500;
+    }
+  </style>
 
-    --text-main: #2b241a;
-    --text-dim: rgba(43,36,26,.55);
-
-    --radius-lg: 20px;
-    --radius-md: 14px;
-
-    --shadow-card: 0 16px 40px rgba(43,36,26,.08),
-                   0 3px 8px rgba(43,36,26,.05);
-    --shadow-soft: 0 8px 28px rgba(43,36,26,.06),
-                   0 1px 4px rgba(43,36,26,.04);
-
-    --ring-track: rgba(43,36,26,.07);
-
-    --blur-bg:rgba(255,255,255,.55);
-    --blur-border:rgba(255,255,255,.4);
-    --blur-shadow:0 20px 60px rgba(43,36,26,.20);
-  }
-
-  body {
-    background: var(--bg-page);
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    color: var(--text-main);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* navbar الشفاف نفس Landing */
-  header.navShell {
-    position:sticky;
-    top:0;
-    z-index:100;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background:var(--blur-bg);
-    border-bottom:1px solid var(--blur-border);
-    box-shadow:var(--blur-shadow);
-    padding:12px 16px;
-  }
-  .navInner {
-    max-width:1200px;
-    margin:0 auto;
-    display:flex;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:16px;
-  }
-  .brandArea {
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-weight:600;
-    color:var(--brand-dark);
-    font-size:15px;
-    letter-spacing:-0.03em;
-  }
-  .brandLogo {
-    width:32px;
-    height:32px;
-    border-radius:10px;
-    background:#e9f3e9;
-    border:1px solid rgba(91,127,74,.25);
-    box-shadow:0 10px 24px rgba(91,127,74,.25);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-  }
-  .brandLogo img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-  }
-  nav.topNav {
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    font-size:13px;
-    margin-inline-start:auto;
-    margin-inline-end:0;
-  }
-  nav.topNav a {
-    --bg:rgba(43,36,26,.04);
-    background:var(--bg);
-    border:1px solid rgba(43,36,26,.07);
-    color:var(--text-main);
-    text-decoration:none;
-    padding:7px 12px;
-    border-radius:999px;
-    line-height:1.2;
-    font-weight:500;
-    transition:all .16s;
-  }
-  nav.topNav a.active {
-    background:var(--mint-soft);
-    border-color:rgba(91,127,74,.4);
-    color:var(--brand-dark);
-    box-shadow:0 12px 32px rgba(91,127,74,.18);
-  }
-  nav.topNav a:hover {
-    background:rgba(43,36,26,.07);
-  }
-
-  main {
-    padding:16px;
-    max-width:1200px;
-    margin:0 auto 64px auto;
-  }
-
-  .autoRefreshToggle {
-    display:flex;
-    align-items:center;
-    gap:8px;
-    font-size:13px;
-    color:var(--text-main);
-    cursor:pointer;
-    user-select:none;
-    margin-bottom:16px;
-  }
-  .autoRefreshToggle .switchOuter {
-    width:34px;
-    height:20px;
-    border-radius:999px;
-    background: var(--panel-border);
-    position:relative;
-    transition:.18s;
-  }
-  .autoRefreshToggle.active .switchOuter {
-    background: var(--ok);
-  }
-  .autoRefreshToggle .switchDot {
-    width: 14px;
-    height:14px;
-    background:#fff;
-    border-radius:999px;
-    position:absolute;
-    top:3px;
-    left:3px;
-    transition:.18s;
-    box-shadow:0 2px 4px rgba(0,0,0,.18);
-  }
-  .autoRefreshToggle.active .switchDot {
-    left:17px;
-  }
-
-  /* بانر التنبيه */
-  .alertBanner {
-    display:none;
-    border-radius: var(--radius-md);
-    padding: 12px 16px;
-    font-size: 14px;
-    font-weight:500;
-    margin-bottom:16px;
-    box-shadow: var(--shadow-soft);
-  }
-  .alertBanner.bad {
-    background: rgba(182,78,66,.12);
-    border:1px solid rgba(182,78,66,.3);
-    color: var(--bad);
-  }
-  .alertBanner.warn {
-    background: rgba(196,163,107,.12);
-    border:1px solid rgba(196,163,107,.3);
-    color: var(--warn);
-  }
-
-  /* اللوحة الحية */
-  .liveWrapper {
-    background: var(--panel-bg);
-    border:1px solid var(--panel-border);
-    box-shadow: var(--shadow-card);
-    border-radius: var(--radius-lg);
-    padding:24px;
-    display:flex;
-    flex-direction:column;
-    gap:24px;
-  }
-
-  .topMetaRow {
-    display:flex;
-    flex-wrap:wrap;
-    row-gap:16px;
-    column-gap:24px;
-    align-items:flex-start;
-    justify-content:space-between;
-  }
-
-  .deviceNameBox {
-    font-size:14px;
-    font-weight:600;
-    color:var(--brand-dark);
-    letter-spacing:-0.03em;
-  }
-
-  .lastUpdatedBox {
-    font-size:13px;
-    color:var(--text-dim);
-    font-weight:400;
-  }
-
-  .cardsRow {
-    display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
-    gap:16px;
-  }
-
-  .statCard {
-    background: var(--mint-soft);
-    border-radius: var(--radius-md);
-    border:1px solid rgba(91,127,74,.15);
-    padding:16px 16px 14px 16px;
-    min-height:120px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    box-shadow:0 12px 32px rgba(91,127,74,.08);
-  }
-  .statHead {
-    font-size:13px;
-    font-weight:500;
-    color:var(--text-main);
-    letter-spacing:-0.03em;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .mainValue {
-    font-size:28px;
-    font-weight:600;
-    color:var(--brand-dark);
-    letter-spacing:-0.04em;
-    line-height:1.2;
-  }
-  .mainValueUnit {
-    font-size:14px;
-    font-weight:400;
-    color:var(--text-dim);
-  }
-  .subNote {
-    font-size:12px;
-    color:var(--text-dim);
-    line-height:1.4;
-  }
-
-  /* بطاقة الإجهاد */
-  .fatigueCard {
-    background: #fff;
-    border-radius: var(--radius-md);
-    border:1px solid rgba(182,78,66,.15);
-    box-shadow:0 12px 32px rgba(182,78,66,.07);
-    padding:16px;
-    min-height:140px;
-    display:flex;
-    gap:16px;
-  }
-  .fatigueRingWrap {
-    position:relative;
-    width:88px;
-    height:88px;
-    flex-shrink:0;
-  }
-  .fatigueRingWrap svg {
-    width:88px;
-    height:88px;
-    display:block;
-  }
-  .fatigueNumCenter {
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    font-weight:600;
-    color:var(--brand-dark);
-    text-align:center;
-  }
-  .fatigueNumCenter .bigFatigue {
-    font-size:22px;
-    line-height:1.1;
-    letter-spacing:-0.04em;
-  }
-  .fatigueNumLabel {
-    font-size:11px;
-    color:var(--text-dim);
-    line-height:1.2;
-    margin-top:2px;
-  }
-  .fatigueHintBox {
-    flex:1;
-    min-width:0;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-  }
-  .fatigueHintTitle {
-    font-size:14px;
-    font-weight:500;
-    color:var(--text-main);
-    margin-bottom:4px;
-    letter-spacing:-0.03em;
-  }
-  .fatigueHintText {
-    font-size:13px;
-    color:var(--text-dim);
-    line-height:1.5;
-  }
-
-  /* جدول آخر القراءات */
-  .readingsSection {
-    margin-top:32px;
-    background: var(--panel-bg);
-    border:1px solid var(--panel-border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-card);
-    overflow:hidden;
-  }
-  .tableHeaderBar {
-    padding:16px 20px;
-    border-bottom:1px solid var(--panel-border);
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    justify-content:space-between;
-    align-items:flex-start;
-  }
-  .tableHeaderMain {
-    font-size:15px;
-    font-weight:600;
-    color:var(--brand-dark);
-    letter-spacing:-0.03em;
-  }
-  .tableHeaderSub {
-    font-size:12px;
-    color: var(--text-dim);
-    letter-spacing:-0.02em;
-  }
-  .tableScrollWrap {
-    overflow-x:auto;
-  }
-  table {
-    width:100%;
-    border-collapse:collapse;
-    min-width:600px;
-    font-size:13px;
-  }
-  thead th {
-    text-align:right;
-    background: var(--mint-soft);
-    color: var(--text-main);
-    font-weight:500;
-    padding:10px 12px;
-    border-bottom:1px solid rgba(43,36,26,.1);
-    white-space:nowrap;
-  }
-  tbody td {
-    padding:10px 12px;
-    border-bottom:1px solid rgba(43,36,26,.06);
-    color:var(--text-main);
-    white-space:nowrap;
-  }
-  tbody tr:hover {
-    background:rgba(43,36,26,.03);
-  }
-  .mutedCell {
-    color:var(--text-dim);
-  }
-
-  footer {
-    margin-top:48px;
-    padding:24px 16px 48px 16px;
-    text-align:center;
-    font-size:12px;
-    color:var(--text-dim);
-    line-height:1.6;
-  }
-  footer a {
-    color:var(--brand-main);
-    text-decoration:none;
-    font-weight:500;
-  }
-  footer a:hover {
-    text-decoration:underline;
-  }
-
-  @media (min-width:768px){
-    .liveWrapper { padding:32px; }
-    .cardsRow { grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); }
-    .fatigueCard { min-height:160px; }
-  }
-</style>
+  <!-- خطوط أرقام متساوية العرض للقراءات -->
+  <style>
+    .mono {
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
 </head>
 
-<body>
+<body class="min-h-screen flex flex-col">
 
-<header class="navShell">
-  <div class="navInner">
-    <div class="brandArea">
-      <div class="brandLogo">
-        <img src="/static/logo.png" alt="GAIDESK Logo"/>
-      </div>
-      <div>GAIDESK</div>
+  <!-- الهيدر / الناف -->
+  <header class="w-full border-b border-black/5 bg-[var(--panel)]/70 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-3">
+
+      <!-- لوجو بسيط -->
+      <a href="/" class="flex items-center gap-2">
+        <div class="h-8 w-8 rounded-full bg-[var(--accent)]/90 text-white flex items-center justify-center font-semibold text-xs tracking-tight shadow-sm">
+          G
+        </div>
+        <div class="flex flex-col leading-tight">
+          <span class="text-sm font-semibold text-[var(--text-main)] -mb-0.5">GAIDESK</span>
+          <span class="text-[10px] text-[var(--text-main)]/60">Smart Desk Coach</span>
+        </div>
+      </a>
+
+      <!-- روابط -->
+      <nav class="flex flex-wrap gap-2 text-[13px] font-medium">
+        <a class="px-3 py-1.5 rounded-lg hover:bg-white hover:text-[var(--text-main)]/90 transition"
+           href="/">الرئيسية</a>
+
+        <a class="px-3 py-1.5 rounded-lg bg-white text-[var(--text-main)] shadow-sm"
+           href="/dashboard">المراقبة الآن</a>
+
+        <a class="px-3 py-1.5 rounded-lg hover:bg-white hover:text-[var(--text-main)]/90 transition"
+           href="/summary">ملخص الجلسة</a>
+
+        <a class="px-3 py-1.5 rounded-lg hover:bg-white hover:text-[var(--text-main)]/90 transition"
+           href="/about">عن المشروع</a>
+      </nav>
+
     </div>
+  </header>
 
-    <nav class="topNav">
-      <a href="/">الرئيسية</a>
-      <a class="active" href="/live">المراقبة الآن</a>
-      <a href="/session">ملخص الجلسة</a>
-      <a href="/about">عن المشروع</a>
-    </nav>
-  </div>
-</header>
+  <!-- المحتوى -->
+  <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-8 space-y-10">
 
-<main>
+    <!-- ===== صف البطاقات الرئيسية ===== -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-  <!-- زر التحديث التلقائي -->
-  <div id="refreshToggle" class="autoRefreshToggle active">
-    <div style="font-size:13px;">تحديث تلقائي</div>
-    <div class="switchOuter"><div class="switchDot"></div></div>
-  </div>
-
-  <!-- بانر التنبيهات -->
-  <div id="alertBanner" class="alertBanner"></div>
-
-  <!-- اللوحة الرئيسية -->
-  <section class="liveWrapper">
-
-    <div class="topMetaRow">
-      <div class="deviceNameBox">
-        <span id="deviceName">GAIDESK-01</span>
-      </div>
-
-      <div class="lastUpdatedBox" id="lastUpdated">
-        آخر تحديث: —
-      </div>
-    </div>
-
-    <div class="cardsRow">
-      <!-- وجود -->
-      <div class="statCard">
-        <div class="statHead">
-          <span>وجود المستخدم</span>
-          <span id="presenceBadge"
-                style="font-size:12px;border-radius:999px;padding:2px 8px;
-                       background:rgba(196,163,107,.15);
-                       color:var(--text-main);">
-            —
-          </span>
-        </div>
-        <div class="mainValue" id="presenceVal">0</div>
-        <div class="subNote">
-          1 = المستخدم جالس الآن
-          <br/>
-          0 = المستخدم مو موجود
-        </div>
-      </div>
-
-      <!-- CO₂ -->
-      <div class="statCard">
-        <div class="statHead">
-          <span>الهواء (CO₂)</span>
-          <span id="co2Quality"
-                style="font-size:12px;font-weight:500;color:var(--text-dim);">
-            —
-          </span>
-        </div>
-
-        <div class="mainValue">
-          <span id="co2Val">—</span>
-          <span class="mainValueUnit">ppm</span>
-        </div>
-
-        <div class="subNote">جودة الهواء حوالين المكتب</div>
-      </div>
-
-      <!-- الحرارة -->
-      <div class="statCard">
-        <div class="statHead">
-          <span>الحرارة الآن</span>
-          <span id="tempComfort"
-                style="font-size:12px;font-weight:500;color:var(--text-dim);">
-            —
-          </span>
-        </div>
-
-        <div class="mainValue">
-          <span id="tempVal">—</span>
-          <span class="mainValueUnit">°C</span>
-        </div>
-
-        <div class="subNote">هل المكان مريح أو خانق</div>
-      </div>
-
-      <!-- الإجهاد -->
-      <div class="fatigueCard">
-        <div class="fatigueRingWrap">
-          <svg viewBox="0 0 110 110">
-            <!-- الخلفية -->
-            <circle cx="55" cy="55" r="50"
-              stroke="var(--ring-track)"
-              stroke-width="10" fill="none"
-              stroke-linecap="round"
-              stroke-dasharray="314"
-              stroke-dashoffset="0"/>
-            <!-- المؤشر -->
-            <circle id="fatigueRing" cx="55" cy="55" r="50"
-              stroke="var(--ok)"
-              stroke-width="10" fill="none"
-              stroke-linecap="round"
-              stroke-dasharray="314"
-              stroke-dashoffset="314"/>
-          </svg>
-
-          <div class="fatigueNumCenter">
-            <div id="fatigueNum" class="bigFatigue">0%</div>
-            <div class="fatigueNumLabel">إجهاد الجلسة</div>
+      <!-- بطاقة الحالة الحالية -->
+      <div class="glass-card p-5 flex flex-col justify-between">
+        <div class="flex items-start justify-between">
+          <div class="section-title">
+            <span class="inline-block h-2 w-2 rounded-full bg-[var(--ok)] shadow-[0_0_8px_rgba(31,122,74,.6)]"></span>
+            <span>الجلسة الآن</span>
+          </div>
+          <div id="deviceName"
+               class="text-[11px] text-[var(--text-main)]/60 font-medium bg-white/60 px-2 py-[2px] rounded-md border border-black/5">
+            GAIDESK-01
           </div>
         </div>
 
-        <div class="fatigueHintBox">
-          <div class="fatigueHintTitle">نصيحة الآن</div>
-          <div class="fatigueHintText" id="fatigueHint">
-            وضعك حاليًا مقبول.
+        <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+          <!-- حرارة -->
+          <div class="bg-white/70 rounded-lg border border-black/5 py-4">
+            <div class="text-[11px] text-[var(--text-main)]/60 font-medium">الحرارة</div>
+            <div id="tempVal" class="text-xl font-semibold text-[var(--text-main)] mono mt-1">--.-°C</div>
+            <div id="tempHint" class="text-[11px] text-[var(--text-main)]/50 mt-1">—</div>
+          </div>
+
+          <!-- CO₂ -->
+          <div class="bg-white/70 rounded-lg border border-black/5 py-4">
+            <div class="text-[11px] text-[var(--text-main)]/60 font-medium">جودة الهواء (CO₂)</div>
+            <div class="flex flex-col items-center mt-1">
+              <div id="co2Val" class="text-xl font-semibold text-[var(--text-main)] mono">---- ppm</div>
+              <div id="co2Hint" class="text-[11px] text-[var(--text-main)]/50 mt-1">—</div>
+            </div>
           </div>
         </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+          <!-- إجهاد الجلسة -->
+          <div class="bg-white/70 rounded-lg border border-black/5 py-4 col-span-2 sm:col-span-1">
+            <div class="text-[11px] text-[var(--text-main)]/60 font-medium">إجهاد الجلسة (fatigue)</div>
+            <div id="fatigueVal" class="text-xl font-semibold text-[var(--text-main)] mono mt-1">0%</div>
+            <div class="flex justify-center">
+              <div id="fatigueBadge" class="badge-soft mt-2">مريح</div>
+            </div>
+          </div>
+
+          <!-- وجودك -->
+          <div class="bg-white/70 rounded-lg border border-black/5 py-4 col-span-2 sm:col-span-1">
+            <div class="text-[11px] text-[var(--text-main)]/60 font-medium">وجودك</div>
+            <div id="presenceVal" class="text-xl font-semibold text-[var(--text-main)] mono mt-1">—</div>
+            <div class="text-[11px] text-[var(--text-main)]/50 mt-1">1 = موجود / 0 = مو موجود</div>
+          </div>
+        </div>
+
+        <div class="text-[11px] text-[var(--text-main)]/50 mt-4 border-t border-black/10 pt-3 leading-relaxed">
+          يعتمد GAIDESK على جسمك نفسه مو على تايمر ثابت. لو تعبك يوصل 100% لازم توقف وتأخذ بريك.
+        </div>
       </div>
-    </div>
 
-  </section>
+      <!-- بطاقة التنبيه المباشر -->
+      <div class="glass-card p-5 flex flex-col justify-between lg:col-span-2">
+        <div class="flex items-start justify-between">
+          <div class="section-title">
+            <span class="inline-block h-2 w-2 rounded-full bg-[var(--danger)] shadow-[0_0_8px_rgba(185,74,74,.6)]"></span>
+            <span>التنبيه الحي</span>
+          </div>
 
-  <!-- جدول آخر القراءات -->
-  <section class="readingsSection">
-    <div class="tableHeaderBar">
-      <div class="tableHeaderMain">آخر القراءات</div>
-      <div class="tableHeaderSub">
-        الجهاز: <span id="tableMeta">GAIDESK-01</span>
+          <span id="lastUpdate"
+            class="text-[11px] text-[var(--text-main)]/60 font-medium bg-white/60 px-2 py-[2px] rounded-md border border-black/5">
+            آخر تحديث: —
+          </span>
+        </div>
+
+        <div class="mt-4 bg-white/70 rounded-xl border border-black/5 p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="flex-1">
+            <div id="alertTitle" class="text-[var(--text-main)] font-semibold text-lg leading-snug">
+              كل شيء طبيعي 👌
+            </div>
+            <div id="alertDesc" class="text-[13px] text-[var(--text-main)]/70 mt-1 leading-relaxed">
+              الجلسة حالياً داخل الحدود المريحة. كمل شغلك 👇
+            </div>
+          </div>
+
+          <div class="flex flex-col items-stretch text-center min-w-[8rem]">
+            <div id="alertBadge" class="badge-soft w-full text-center">
+              طبيعي
+            </div>
+            <button
+              onclick="location.href='/summary'"
+              class="mt-3 text-[13px] font-medium bg-[var(--accent)] text-white rounded-lg px-4 py-2 shadow-sm hover:shadow transition">
+              شوف ملخص الجلسة
+            </button>
+          </div>
+        </div>
+
+        <div class="text-[11px] text-[var(--text-main)]/50 mt-4 leading-relaxed">
+          يظهر هنا لو في شي خطر فعلي (وضعية جلوس سيئة جدًا / قربك من الشاشة / CO₂ عالي / تعب 100%). الفكرة: ما نقاطعك إلا لو جسمك فعلاً بدأ ينهار 🔥.
+        </div>
       </div>
+
+    </section>
+
+    <!-- ===== جدول آخر القراءات ===== -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="section-title text-[var(--text-main)]">
+          <span class="inline-block h-2 w-2 rounded-full bg-[var(--text-main)]/50"></span>
+          <span>آخر القراءات</span>
+        </div>
+        <div
+          id="tableDeviceName"
+          class="text-[11px] text-[var(--text-main)]/60 font-medium bg-white/60 px-2 py-[2px] rounded-md border border-black/5">
+          الجهاز: GAIDESK-01
+        </div>
+      </div>
+
+      <div class="glass-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-[13px] text-[var(--text-main)]">
+            <thead class="bg-white/60 border-b border-black/10 text-[11px] text-[var(--text-main)]/60 font-medium">
+              <tr class="text-center">
+                <th class="py-3 px-2 whitespace-nowrap font-medium">الوقت</th>
+                <th class="py-3 px-2 whitespace-nowrap font-medium">الـ % إجهاد</th>
+                <th class="py-3 px-2 whitespace-nowrap font-medium">CO₂</th>
+                <th class="py-3 px-2 whitespace-nowrap font-medium">°C</th>
+                <th class="py-3 px-2 whitespace-nowrap font-medium">وجود</th>
+                <th class="py-3 px-2 whitespace-nowrap font-medium">المسافة (سم)</th>
+              </tr>
+            </thead>
+            <tbody id="readingsBody" class="divide-y divide-black/5 text-center">
+              <!-- السطور تتعبى بالجافاسكربت -->
+              <tr>
+                <td colspan="6" class="py-8 text-[var(--text-main)]/40 text-[13px]">
+                  جاري التحميل...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="text-[11px] text-[var(--text-main)]/50 leading-relaxed">
+        نعرض آخر القياسات الحقيقية اللي الجهاز رسلها: حرارة / CO₂ / قربك من الشاشة / هل أنت موجود / ونسبة الإجهاد لحظياً.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- الفوتر -->
+  <footer class="w-full border-t border-black/10 bg-[var(--panel)]/70 mt-12">
+    <div class="max-w-6xl mx-auto px-4 py-6 text-[11px] flex flex-col sm:flex-row items-center justify-between gap-3 text-[var(--text-main)]/60 leading-relaxed">
+      <div class="text-center sm:text-right">
+        © <span id="year"></span> GAIDESK. جميع الحقوق محفوظة.
+      </div>
+      <a href="https://www.linkedin.com/in/USERNAME_HERE"
+         class="underline hover:text-[var(--accent)] transition"
+         target="_blank" rel="noopener noreferrer">
+        LinkedIn
+      </a>
     </div>
+  </footer>
 
-    <div class="tableScrollWrap">
-      <table>
-        <thead>
-          <tr>
-            <th>الوقت</th>
-            <th>الجهاز</th>
-            <th>% الإجهاد</th>
-            <th>وجود</th>
-            <th>CO₂</th>
-            <th>°C</th>
-            <th>bpm</th>
-            <th>المسافة</th>
-          </tr>
-        </thead>
+  <!-- سكربت جلب البيانات وتحديث الصفحة -->
+  <script>
+    async function fetchData() {
+      try {
+        // نجيب الداتا من السيرفر تبعك (Flask API)
+        // NOTE: لازم في server.py يكون عندك /api/data يرجع آخر القراءات
+        const r = await fetch('/api/data?limit=20');
+        const json = await r.json(); // شكلها [{key, value:{...}}]
 
-        <tbody id="readingsBody">
-          <tr>
-            <td colspan="8"
-                style="text-align:center;color:var(--text-dim);padding:24px;">
-              لا توجد بيانات بعد
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+        if (!Array.isArray(json) || json.length === 0) {
+          setStatusEmpty();
+          return;
+        }
 
-</main>
+        // آخر عنصر (أجدد قياس)
+        const latest = json[0].value || {};
+        const latestKey = json[0].key || "";
+        updateNowSection(latest, latestKey);
 
-<footer>
-  <div>© <span id="yearNow"></span> GAIDESK. كل الحقوق محفوظة.</div>
-  <div>
-    تواصل على
-    <a href="https://www.linkedin.com/in/YOUR_LINKEDIN"
-       target="_blank" rel="noopener">
-      LinkedIn
-    </a>
-  </div>
-</footer>
-
-<script>
-  // نفس سكريبت جلب البيانات اللي عطيتك قبل 👇
-  let deviceName = "GAIDESK-01";
-
-  const lastUpdatedEl    = document.getElementById('lastUpdated');
-  const presenceBadgeEl  = document.getElementById('presenceBadge');
-  const presenceValEl    = document.getElementById('presenceVal');
-
-  const co2ValEl         = document.getElementById('co2Val');
-  const co2QualityEl     = document.getElementById('co2Quality');
-
-  const tempValEl        = document.getElementById('tempVal');
-  const tempComfortEl    = document.getElementById('tempComfort');
-
-  const fatigueNumEl     = document.getElementById('fatigueNum');
-  const fatigueRingEl    = document.getElementById('fatigueRing');
-  const fatigueHintEl    = document.getElementById('fatigueHint');
-
-  const deviceNameEl     = document.getElementById('deviceName');
-  const tableMetaEl      = document.getElementById('tableMeta');
-  const yearNowEl        = document.getElementById('yearNow');
-
-  const alertBannerEl    = document.getElementById('alertBanner');
-  const readingsBodyEl   = document.getElementById('readingsBody');
-
-  const refreshToggleEl  = document.getElementById('refreshToggle');
-
-  yearNowEl.textContent = new Date().getFullYear().toString();
-  deviceNameEl.textContent = deviceName;
-  tableMetaEl.textContent = deviceName;
-
-  let autoRefresh = true;
-  refreshToggleEl.addEventListener('click', () => {
-    autoRefresh = !autoRefresh;
-    refreshToggleEl.classList.toggle('active', autoRefresh);
-  });
-
-  let latestData = [];
-
-  function co2Status(ppm){
-    if (ppm == null || isNaN(ppm))
-      return {label:"—", color:"var(--text-dim)", level:"none"};
-    if (ppm < 800)
-      return {label:"ممتاز", color:"var(--ok)", level:"ok"};
-    if (ppm < 1200)
-      return {label:"مقبول", color:"var(--warn)", level:"warn"};
-    if (ppm < 2000)
-      return {label:"سيّء", color:"var(--warn)", level:"warn"};
-    return {label:"خطر", color:"var(--bad)", level:"bad"};
-  }
-  function tempStatus(c){
-    if (c == null || isNaN(c))
-      return {label:"—", color:"var(--text-dim)"};
-    if (c >= 20 && c <= 26)
-      return {label:"مريح", color:"var(--ok)"};
-    return {label:"غير مريح", color:"var(--warn)"};
-  }
-  function fatigueColor(pct){
-    if (pct >= 100) return "var(--bad)";
-    if (pct >= 70)  return "var(--warn)";
-    return "var(--ok)";
-  }
-  function fmtFullTimeFromTS(ts){
-    if (!ts) return "—";
-    const d = new Date(ts);
-    return d.toLocaleString('ar-SA', {
-      year:'numeric', month:'short', day:'numeric',
-      hour:'2-digit', minute:'2-digit'
-    });
-  }
-
-  function renderMainCards(){
-    if(!latestData.length) return;
-    const latest = latestData[0];
-
-    lastUpdatedEl.textContent = "آخر تحديث: " +
-      fmtFullTimeFromTS(latest.ts || latest.ts_ms);
-
-    const isHere = (latest.presence === 1);
-    presenceValEl.textContent = isHere ? "1" : "0";
-    presenceBadgeEl.textContent = isHere ? "موجود" : "غير موجود";
-    presenceBadgeEl.style.background = isHere
-      ? "rgba(91,127,74,.15)"
-      : "rgba(196,163,107,.15)";
-    presenceBadgeEl.style.color = isHere
-      ? "var(--ok)"
-      : "var(--text-main)";
-
-    const ppm = latest.co2;
-    const co2Stat = co2Status(ppm);
-    co2ValEl.textContent = (ppm!=null && !isNaN(ppm)) ? ppm : "—";
-    co2QualityEl.textContent = co2Stat.label;
-    co2QualityEl.style.color = co2Stat.color;
-
-    const tC = latest.t;
-    const tempStat = tempStatus(tC);
-    tempValEl.textContent = (tC!=null && !isNaN(tC)) ? tC.toFixed(1) : "—";
-    tempComfortEl.textContent = tempStat.label;
-    tempComfortEl.style.color = tempStat.color;
-
-    let Fpct = latest.F != null && !isNaN(latest.F) ? Number(latest.F) : 0;
-    if(Fpct<0) Fpct=0;
-    if(Fpct>100) Fpct=100;
-    fatigueNumEl.textContent = Fpct.toFixed(0) + "%";
-    const circleLen = 314;
-    const off = circleLen - (circleLen * (Fpct/100));
-    fatigueRingEl.setAttribute("stroke-dashoffset", off.toString());
-    fatigueRingEl.setAttribute("stroke", fatigueColor(Fpct));
-
-    if(Fpct >= 100){
-        fatigueHintEl.textContent = "إجهادك وصل 100%. لازم توقف الآن.";
-    } else if(Fpct >= 70){
-        fatigueHintEl.textContent = "الإجهاد مرتفع. خذ استراحة قصيرة.";
-    } else {
-        fatigueHintEl.textContent = "وضعك حاليًا مقبول.";
-    }
-
-    const distCm = latest.dist;
-    const tooClose = (distCm != null && !isNaN(distCm) && distCm <= 45);
-
-    let bannerMsg = "";
-    let bannerClass = "";
-
-    if(Fpct >= 100){
-      bannerMsg   = "إجهادك وصل 100%. أوقف وخذ بريك الآن.";
-      bannerClass = "bad";
-    } else if (co2Stat.level === "bad"){
-      bannerMsg   = "الهواء سيء جدًا (CO₂ عالي). افتح تهوية.";
-      bannerClass = "bad";
-    } else if (tooClose){
-      bannerMsg   = "قريب جدًا من الشاشة. ارجع للخلف شوي عشان رقبتك.";
-      bannerClass = "warn";
-    } else if (Fpct >= 70){
-      bannerMsg   = "الإجهاد مرتفع. خذ استراحة قصيرة.";
-      bannerClass = "warn";
-    } else if (co2Stat.level === "warn"){
-      bannerMsg   = "الهواء مو مثالي. جرّب تفتح تهوية بسيطة.";
-      bannerClass = "warn";
-    }
-
-    if(bannerMsg){
-      alertBannerEl.textContent   = bannerMsg;
-      alertBannerEl.className     = "alertBanner " + bannerClass;
-      alertBannerEl.style.display = "block";
-    } else {
-      alertBannerEl.style.display = "none";
-    }
-  }
-
-  function renderTable(){
-    const rows = latestData.slice(0,10);
-    if(!rows.length){
-      readingsBodyEl.innerHTML =
-        '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:24px;">لا توجد بيانات بعد</td></tr>';
-      return;
-    }
-
-    readingsBodyEl.innerHTML = rows.map(item=>{
-      const tsMs   = item.ts || item.ts_ms || null;
-      const timeStr= fmtFullTimeFromTS(tsMs);
-
-      const Fpct   = (item.F != null && !isNaN(item.F))
-        ? (item.F + "%") : "—";
-
-      const presence = item.presence === 1 ? "1" : "0";
-
-      const co2 = (item.co2 != null && !isNaN(item.co2))
-        ? item.co2
-        : "—";
-
-      const t   = (item.t   != null && !isNaN(item.t))
-        ? item.t.toFixed(1)
-        : "—";
-
-      const bpm = (item.bpm != null && !isNaN(item.bpm))
-        ? item.bpm.toFixed(1)
-        : "—";
-
-      const dist= (item.dist!= null && !isNaN(item.dist))
-        ? (item.dist.toFixed(0)+"cm")
-        : "—";
-
-      return `
-        <tr>
-          <td class="mutedCell">${timeStr}</td>
-          <td>${deviceName}</td>
-          <td>${Fpct}</td>
-          <td>${presence}</td>
-          <td>${co2}</td>
-          <td>${t}</td>
-          <td>${bpm}</td>
-          <td>${dist}</td>
-        </tr>
-      `;
-    }).join("");
-  }
-
-  async function fetchLatest(){
-    try {
-      const res = await fetch('/api/data?limit=50&device=' + encodeURIComponent(deviceName));
-      const arr = await res.json();
-      if(Array.isArray(arr)){
-        latestData = arr
-          .map(row => {
-            if (row && row.value && typeof row.value === "object") {
-              const v = row.value;
-              return {
-                ts      : v.ts,
-                ts_ms   : v.ts,
-                co2     : v.co2,
-                t       : v.t,
-                F       : v.F,
-                bpm     : v.bpm,
-                dist    : v.dist,
-                presence: v.presence
-              };
-            }
-            return row;
-          })
-          .filter(x => x && (x.ts || x.ts_ms));
+        // الجدول
+        renderTable(json);
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err){
-      console.warn("fetch /api/data failed", err);
     }
 
-    renderMainCards();
-    renderTable();
-  }
+    function setStatusEmpty() {
+        document.getElementById('tempVal').textContent = '--.-°C';
+        document.getElementById('tempHint').textContent = '—';
 
-  fetchLatest();
-  setInterval(()=>{
-    if(refreshToggleEl.classList.contains('active')){
-      fetchLatest();
+        document.getElementById('co2Val').textContent = '---- ppm';
+        document.getElementById('co2Hint').textContent = '—';
+
+        document.getElementById('fatigueVal').textContent = '0%';
+        document.getElementById('fatigueBadge').textContent = '—';
+
+        document.getElementById('presenceVal').textContent = '—';
+
+        document.getElementById('alertTitle').textContent = 'مافي بيانات حالياً';
+        document.getElementById('alertDesc').textContent  = 'الجهاز ما أرسل قراءات جديدة للحين.';
+        document.getElementById('alertBadge').textContent = 'بانتظار اتصال';
+        document.getElementById('alertBadge').className   = 'badge-warn w-full text-center';
+
+        document.getElementById('lastUpdate').textContent = 'آخر تحديث: —';
+
+        const tbody = document.getElementById('readingsBody');
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-[var(--text-main)]/40 text-[13px]">
+              لا يوجد قراءات محفوظة بعد.
+            </td>
+          </tr>`;
     }
-  }, 5000);
-</script>
 
+    function qualityCO2(ppm) {
+      if (ppm == null || isNaN(ppm)) return {txt:'—',hint:'—',bad:false};
+      if (ppm > 2000) return {txt: ppm + ' ppm', hint:'هواء سيئ جدًا', bad:true};
+      if (ppm > 1500) return {txt: ppm + ' ppm', hint:'هواء متعب', bad:true};
+      return {txt: ppm + ' ppm', hint:'هواء مقبول', bad:false};
+    }
+
+    function fatigueInfo(F) {
+      if (F == null || isNaN(F)) return {pct:'0%', badge:'—', warn:false};
+      const pct = Math.round(F) + '%';
+      if (F >= 100) return {pct, badge:'قف فوراً', warn:true};
+      if (F >= 70)  return {pct, badge:'إجهاد عالي', warn:true};
+      return {pct, badge:'مريح', warn:false};
+    }
+
+    function updateNowSection(latest, keyStr) {
+      const temp = latest.t;
+      const co2  = latest.co2;
+      const pres = latest.presence;
+      const dist = latest.dist;
+      const F    = latest.F;
+
+      // حرارة
+      document.getElementById('tempVal').textContent =
+        (temp != null && !isNaN(temp)) ? temp.toFixed(1) + '°C' : '--.-°C';
+
+      document.getElementById('tempHint').textContent =
+        (temp != null && !isNaN(temp))
+          ? (temp > 30 ? 'جو حار' : 'جو عادي')
+          : '—';
+
+      // CO2
+      const co2q = qualityCO2(co2);
+      document.getElementById('co2Val').textContent = co2q.txt;
+      document.getElementById('co2Hint').textContent = co2q.hint;
+
+      // إجهاد
+      const finfo = fatigueInfo(F);
+      document.getElementById('fatigueVal').textContent = finfo.pct;
+      const badgeEl = document.getElementById('fatigueBadge');
+      badgeEl.textContent = finfo.badge;
+      badgeEl.className = (finfo.warn ? 'badge-warn' : 'badge-soft') + ' mt-2';
+
+      // وجود
+      document.getElementById('presenceVal').textContent =
+        (pres === 1) ? 'موجود' : (pres === 0) ? 'مو موجود' : '—';
+
+      // آخر تحديث
+      const tsMs = latest.ts;
+      let tsText = '—';
+      if (typeof tsMs === 'number') {
+        const d = new Date(tsMs);
+        tsText = d.toLocaleString('ar-SA', { hour12:true });
+      }
+      document.getElementById('lastUpdate').textContent =
+        'آخر تحديث: ' + tsText;
+
+      // التنبيه الحي
+      const alertTitleEl = document.getElementById('alertTitle');
+      const alertDescEl  = document.getElementById('alertDesc');
+      const alertBadgeEl = document.getElementById('alertBadge');
+
+      // منطق التنبيه
+      if (finfo.warn) {
+        alertTitleEl.textContent = 'إجهاد عالي! لازم توقف شوية ';
+        alertDescEl.textContent  = 'جسمك قاعد يتعب. خذ بريك الآن قبل ما توصل حد خطير.';
+        alertBadgeEl.textContent = finfo.badge;
+        alertBadgeEl.className   = 'badge-warn w-full text-center';
+      } else if (co2q.bad) {
+        alertTitleEl.textContent = 'الهواء مو كويس ';
+        alertDescEl.textContent  = 'افتح الشباك / بدّل المكان لحظياً. مستوى CO₂ مرتفع وممكن يسبب صداع وتعب.';
+        alertBadgeEl.textContent = 'تهوية سيئة';
+        alertBadgeEl.className   = 'badge-warn w-full text-center';
+      } else if (dist != null && !isNaN(dist) && dist < 45) {
+        alertTitleEl.textContent = 'قريب مرّه من الشاشة ';
+        alertDescEl.textContent  = 'ابعِد شوي عن الشاشة عشان رقبتك وعيونك.';
+        alertBadgeEl.textContent = 'وضعية غير صحية';
+        alertBadgeEl.className   = 'badge-warn w-full text-center';
+      } else {
+        alertTitleEl.textContent = 'كل شيء طبيعي ';
+        alertDescEl.textContent  = 'الجلسة حالياً داخل الحدود المريحة. كمل شغلك';
+        alertBadgeEl.textContent = 'طبيعي';
+        alertBadgeEl.className   = 'badge-soft w-full text-center';
+      }
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById('readingsBody');
+      tbody.innerHTML = '';
+
+      // list: [{key, value:{...}}, ...]  (أجدد أول عنصر)
+      list.forEach((row, idx) => {
+        const val = row.value || {};
+        const ts  = val.ts;
+        const d   = (typeof ts === 'number') ? new Date(ts) : null;
+        const timeTxt = d
+          ? d.toLocaleString('ar-SA', {hour12:true})
+          : '—';
+
+        const finfo = fatigueInfo(val.F);
+        const co2v  = (val.co2 != null && !isNaN(val.co2)) ? val.co2 : '—';
+        const tempv = (val.t   != null && !isNaN(val.t))   ? val.t.toFixed(1) : '—';
+        const presv = (val.presence === 1) ? 'موجود' :
+                      (val.presence === 0) ? 'مو موجود' : '—';
+        const distv = (val.dist != null && !isNaN(val.dist))
+                      ? Math.round(val.dist) : '—';
+
+        const tr = document.createElement('tr');
+        tr.className = "text-center text-[13px] text-[var(--text-main)]/90 hover:bg-white/50 transition";
+
+        tr.innerHTML = `
+          <td class="py-3 px-2 whitespace-nowrap mono text-[var(--text-main)]/70">${timeTxt}</td>
+          <td class="py-3 px-2 whitespace-nowrap mono">
+            ${finfo.pct}
+          </td>
+          <td class="py-3 px-2 whitespace-nowrap mono">${co2v}</td>
+          <td class="py-3 px-2 whitespace-nowrap mono">${tempv}</td>
+          <td class="py-3 px-2 whitespace-nowrap">${presv}</td>
+          <td class="py-3 px-2 whitespace-nowrap mono">${distv}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // سنة في الفوتر
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // تحديث كل شوية (5 ثواني)
+    fetchData();
+    setInterval(fetchData, 5000);
+  </script>
 </body>
 </html>

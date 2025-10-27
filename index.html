@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>GAIDESK | مساعدك الصحي على المكتب</title>
+
+  <!-- خط عربي ناعم -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- ملف التنسيق -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+</head>
+<body class="page-bg">
+
+  <!-- شريط التنقل -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo-dot"></div>
+        <span class="brand-name">GAIDESK</span>
+        <span class="brand-badge">بيتا</span>
+      </div>
+
+      <nav class="nav-links">
+        <a href="{{ url_for('home') }}" class="nav-link active">الرئيسية</a>
+        <a href="{{ url_for('devices_page') }}" class="nav-link">المراقبة الآن</a>
+        <a href="{{ url_for('about') }}" class="nav-link">عن المشروع</a>
+        <a href="{{ url_for('api_docs') }}" class="nav-link">واجهة API</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- هيرو / الانطباع الأول -->
+  <section class="hero-section">
+    <div class="hero-content card-soft">
+      <div class="hero-left">
+        <h1 class="hero-title">
+          مساعد مكتب ذكي يراقب جسدك وبيئتك لحظيًا.
+        </h1>
+
+        <p class="hero-desc">
+          GAIDESK يتابع جلستك، تنفسك، ومدى قربك من الشاشة، وحتى جودة الهواء
+          (مثل ثاني أكسيد الكربون وحرارة الغرفة). ما يعتمد على "مؤقت كل 30 دقيقة"…
+          بل يفهم فعليًا متى بدأ جسمك يتعب ويقولك: خلاص، خذ بريك.
+        </p>
+
+        <div class="hero-cta">
+          <a class="btn-primary" href="{{ url_for('devices_page') }}">
+            ابدأ المراقبة الآن
+          </a>
+
+          <a class="btn-ghost" href="#why">
+            ليه GAIDESK؟
+          </a>
+        </div>
+
+        <div class="hero-note">
+          <span class="dot-status dot-ok"></span>
+          <span>متصل بالجهاز</span>
+        </div>
+      </div>
+
+      <div class="hero-right live-preview-card">
+        <div class="live-header">
+          <span class="live-title">نظرة سريعة الآن</span>
+          <span class="live-device">GAIDESK-01</span>
+        </div>
+
+        <div class="live-grid">
+          <div class="live-item">
+            <div class="live-label">الحرارة</div>
+            <div class="live-value">24.5°</div>
+            <div class="live-sub">مريح</div>
+          </div>
+
+          <div class="live-item">
+            <div class="live-label">ثاني أكسيد الكربون</div>
+            <div class="live-value">780 ppm</div>
+            <div class="live-sub">هواء مقبول</div>
+          </div>
+
+          <div class="live-item">
+            <div class="live-label">وضعيتك/المسافة</div>
+            <div class="live-value">56سم</div>
+            <div class="live-sub">آمنة للرقبة 👌</div>
+          </div>
+
+          <div class="live-item">
+            <div class="live-label">إجهاد الجلسة</div>
+            <div class="live-fatigue-wrapper">
+              <div class="fatigue-circle">
+                <div class="fatigue-num">32%</div>
+              </div>
+              <div class="live-sub">لو وصلت 100% لازم توقف</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="live-footer">
+          <div class="tip">
+            هذه القيم تتحدث كل بضع ثواني من جهازك على المكتب.
+          </div>
+          <a class="see-full" href="{{ url_for('devices_page') }}">
+            عرض لوحة المراقبة الكاملة →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم: لماذا GAIDESK مختلف؟ -->
+  <section id="why" class="why-section section-wrapper">
+    <div class="section-head">
+      <h2 class="section-title">ليش GAIDESK مو زي أي "خليك تقوم وتتمشى"؟</h2>
+      <p class="section-desc">
+        المنتجات الموجودة عادةً بس تحط مؤقت كل نصف ساعة وتقولك "وقف". GAIDESK
+        يفهم <strong>جسمك إنت</strong>: تنفسك، وضعيتك، قربك من الشاشة، جودة الهواء حولك،
+        وكم تعبت فعليًا. لما جسمك يبين عليه تعب حقيقي → ينبهك في اللحظة.
+      </p>
+    </div>
+
+    <div class="why-grid">
+      <div class="info-card">
+        <div class="info-title">ينبهك حسب جسمك</div>
+        <div class="info-desc">
+          بدل ما يقول "خذلك بريك كل 30 دقيقة"، GAIDESK يقيس التعب عندك
+          (نظام نقاط إجهاد الجلسة) ويوقفك لما جسمك يوصل حد غير صحي.
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-title">يراقب البيئة مو بس الجلسة</div>
+        <div class="info-desc">
+          CO₂ عالي يطيح تركيزك. حرارة مزعجة ترفع نبضك وتخليك متوتر.
+          الجهاز يتابع العوامل هذه مع بعض ويقولك وين المشكلة.
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-title">يعرف متى صرت قريب خطر من الشاشة</div>
+        <div class="info-desc">
+          يقيس المسافة من الشاشة/اللابتوب، ويعرف لو بدأت تنحني بشكل سيء.
+          ينبهك فورًا بصوت / تنبيه بصري.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم: مين يحتاج GAIDESK؟ -->
+  <section class="audience-section section-wrapper">
+    <div class="section-head">
+      <h2 class="section-title">مين أكثر ناس يستفيدون من GAIDESK؟</h2>
+    </div>
+
+    <div class="audience-grid">
+      <div class="aud-card">
+        <div class="aud-head">ناس التركيز العالي (Hyperfocus)</div>
+        <div class="aud-body">
+          مبرمجين، طلاب، أو ناس عندهم شَطَح تركيز عميق (حتى بدون ما يحسون بالجسم).
+          الجهاز يكون واعي عنك وينبّهك قبل ما توصل مرحلة ألم رقبة/صداع.
+        </div>
+      </div>
+
+      <div class="aud-card">
+        <div class="aud-head">أي شخص يجلس ساعات طويلة</div>
+        <div class="aud-body">
+          موظف مكتب / طالب / شخص يذاكر كثير.
+          نفس المشكلة: جلوس طويل، هواء كتم، وضعية سيئة.
+          الفرق؟ مع GAIDESK عندك مراقبة ذكية + تحليل جلساتك.
+        </div>
+      </div>
+
+      <div class="aud-card">
+        <div class="aud-head">الناس اللي تشتغل وتنسى نفسها</div>
+        <div class="aud-body">
+          GAIDESK مو "موقت يرن". هو حرفيًا يطلعك من الجلسة إذا
+          جسمك بدأ يعطي إشارات تعب جدّية.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- دعوة للإجراء -->
+  <section class="cta-section section-wrapper">
+    <div class="cta-card card-soft">
+      <div class="cta-main">
+        <div class="cta-text">
+          جاهزة تشوفي جلساتك الحقيقية؟
+        </div>
+        <div class="cta-sub">
+          لوحة المراقبة تعرض آخر قراءاتك، التنبيهات اللي صارت لك، وكم تعب جسدك
+          قبل لا يطيح تركيزك.
+        </div>
+      </div>
+
+      <a class="btn-primary large" href="{{ url_for('devices_page') }}">
+        افتح لوحة المراقبة
+      </a>
+    </div>
+  </section>
+
+  <!-- الفوتر -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="foot-left">
+        <div class="foot-brand">GAIDESK</div>
+        <div class="foot-copy">© 2025 جميع الحقوق محفوظة</div>
+        <div class="foot-credit">تصميم وتطوير: <span class="me">Jana Al-Shahrani</span></div>
+      </div>
+
+      <div class="foot-links">
+        <a class="footer-link" href="https://www.linkedin.com/in/YOUR_LINKEDIN_HERE" target="_blank" rel="noopener">
+          LinkedIn
+        </a>
+        <a class="footer-link" href="{{ url_for('about') }}">عن المشروع</a>
+        <a class="footer-link" href="{{ url_for('api_docs') }}">API</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
