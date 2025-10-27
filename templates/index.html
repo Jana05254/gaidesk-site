@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}GAIDESK{% endblock %}
+
+{% block content %}
+
+<section class="landing-hero" dir="rtl">
+    <div class="landing-card">
+
+        <!-- البلوك البصري -->
+        <div class="brand-block">
+            <img
+                src="{{ url_for('static', filename='logo.png') }}"
+                alt="GAIDESK logo"
+                class="hero-logo"
+            />
+            <h1 class="brand-name">GAIDESK</h1>
+            <p class="tagline">
+                مساعد مكتب ذكي يحمي جسمك وتركيزك.
+            </p>
+        </div>
+
+        <!-- أزرار الـ CTA -->
+        <div class="cta-block">
+            <a class="cta-btn primary"
+               href="{{ url_for('devices_page') }}">
+               ابدأ المراقبة الآن
+            </a>
+
+            <a class="cta-btn ghost"
+               href="{{ url_for('about_page') }}">
+               عن GAIDESK
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

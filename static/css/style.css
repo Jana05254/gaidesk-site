@@ -1,11 +1,15 @@
-/* ألوان البراند بناءً على الباليت اللي عطيتيني:
-   خلفيات خضر رمادي باهت / بيج دافي / بني أغمق نصي
-*/
+/* =========================================
+   لوحة الألوان (GAIDESK Brand)
+   خلفيات مائلة للأخضر الباهت
+   بيج دافئ
+   بني أغمق للنصوص المهمة
+========================================= */
 
 :root {
   --bg-page: #f4f6f2;
   --bg-card: rgba(255,255,255,0.6);
   --bg-soft: rgba(244,246,242,0.75);
+  --bg-hard: #ffffff;
 
   --stroke-card: rgba(0,0,0,0.05);
   --shadow-card: 0 24px 48px rgba(0,0,0,0.06);
@@ -13,9 +17,9 @@
   --text-main: #2f2f2f;
   --text-dim: rgba(47,47,47,0.6);
 
-  --accent-dark: #604b3f;    /* البني الدافئ */
-  --accent-mid: #cbb79c;     /* بيج/ذهبي ترابي */
-  --accent-bg: rgba(203,183,156,0.08);
+  --accent-dark: #604b3f;    /* بني دافئ */
+  --accent-mid: #cbb79c;     /* بيج ترابي */
+  --accent-bg: rgba(203,183,156,0.08); /* خلفيات ناعمة */
 
   --radius-lg: 20px;
   --radius-md: 14px;
@@ -38,7 +42,11 @@ body {
   font-size: 16px;
 }
 
-/* ---------------- NAVBAR ---------------- */
+/* =========================================
+   NAVBAR
+   يظهر أعلى كل الصفحات
+   (index، dashboard، about)
+========================================= */
 
 .navbar {
   position: sticky;
@@ -65,6 +73,7 @@ body {
   gap: .5rem;
   font-weight: 600;
   color: var(--accent-dark);
+  text-decoration: none;
 }
 
 .logo-dot {
@@ -74,10 +83,13 @@ body {
   border-radius: 999px;
   box-shadow: 0 0 10px rgba(96,75,63,0.4);
 }
+
 .brand-name {
   font-size: .95rem;
   letter-spacing: -0.02em;
+  color: var(--accent-dark);
 }
+
 .brand-badge {
   font-size: .7rem;
   line-height: 1;
@@ -94,6 +106,7 @@ body {
   flex-wrap: wrap;
   font-size: .9rem;
 }
+
 .nav-link {
   color: var(--text-main);
   text-decoration: none;
@@ -102,11 +115,14 @@ body {
   border-radius: var(--radius-sm);
   transition: all .15s;
   border: 1px solid transparent;
+  font-weight: 500;
 }
+
 .nav-link:hover {
   background: rgba(0,0,0,0.04);
   border: 1px solid rgba(0,0,0,0.07);
 }
+
 .nav-link.active {
   background: var(--accent-dark);
   color: #fff;
@@ -114,59 +130,68 @@ body {
   box-shadow: 0 10px 20px rgba(96,75,63,0.35);
 }
 
-/* ---------------- HERO ---------------- */
+/* =========================================
+   HERO SECTION (الصفحة الرئيسية index.html)
+   - لوقو كبير
+   - جملة تعريف قصيرة
+   - زر ابدأ و زر عن GAIDESK
+========================================= */
 
-.hero-section {
+.hero-landing {
   max-width: 1280px;
-  margin: 2rem auto 3rem;
+  margin: 3rem auto 4rem;
   padding: 0 1rem;
-}
-
-.card-soft {
-  background: var(--bg-soft);
-  border: 1px solid var(--stroke-card);
-  backdrop-filter: blur(24px);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-
-.hero-content {
   display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(320px,400px);
-  gap: 2rem;
-  padding: 2rem;
-}
-@media(max-width: 900px){
-  .hero-content {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: minmax(0,1fr);
+  justify-items: center;
+  text-align: center;
 }
 
-.hero-left {
+.hero-logo-block {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1rem;
 }
 
-.hero-title {
-  margin: 0;
-  font-size: clamp(1.3rem,1vw+1rem,1.5rem);
-  font-weight: 600;
-  line-height: 1.4;
+.hero-logo-mark {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 30% 30%, #fff 0%, #fff 40%, rgba(203,183,156,0.45) 100%);
+  border: 2px solid var(--accent-mid);
+  box-shadow: 0 24px 48px rgba(203,183,156,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--accent-dark);
+  font-weight: 600;
+  font-size: .8rem;
+  letter-spacing: -.02em;
 }
 
-.hero-desc {
-  margin: 0;
+.hero-logo-text {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--accent-dark);
+  letter-spacing: -.03em;
+  line-height: 1.2;
+}
+
+.hero-tagline {
   font-size: .95rem;
   color: var(--text-dim);
   max-width: 46ch;
+  line-height: 1.6;
 }
 
-.hero-cta {
+.hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: .75rem;
+  margin-top: 1.5rem;
+  justify-content: center;
 }
 
 .btn-primary {
@@ -175,21 +200,19 @@ body {
   text-decoration: none;
   border-radius: var(--radius-md);
   border: 1px solid var(--accent-dark);
-  padding: .7rem 1rem;
-  font-size: .9rem;
+  padding: .8rem 1.2rem;
+  font-size: .95rem;
   font-weight: 500;
   box-shadow: 0 14px 30px rgba(96,75,63,0.35);
   transition: all .15s;
+  display: inline-block;
+  min-width: 9rem;
+  text-align: center;
 }
+
 .btn-primary:hover {
   background: #45352c;
   box-shadow: 0 20px 35px rgba(96,75,63,0.45);
-}
-
-.btn-primary.large {
-  font-size: 1rem;
-  padding: .8rem 1.2rem;
-  border-radius: var(--radius-md);
 }
 
 .btn-ghost {
@@ -197,24 +220,33 @@ body {
   color: var(--accent-dark);
   border: 1px solid rgba(96,75,63,0.25);
   border-radius: var(--radius-md);
-  padding: .7rem 1rem;
-  font-size: .9rem;
+  padding: .8rem 1.2rem;
+  font-size: .95rem;
   font-weight: 500;
   text-decoration: none;
   box-shadow: 0 10px 24px rgba(0,0,0,0.05);
   transition: all .15s;
+  display: inline-block;
+  min-width: 9rem;
+  text-align: center;
 }
+
 .btn-ghost:hover {
   background: rgba(96,75,63,0.07);
 }
 
-.hero-note {
-  display: flex;
-  align-items: center;
-  gap: .4rem;
+/* وصة حالة / اتصال الجهاز */
+.hero-status {
   font-size: .8rem;
   color: var(--text-dim);
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
+
 .dot-status {
   width: .6rem;
   height: .6rem;
@@ -227,10 +259,37 @@ body {
   box-shadow: 0 0 8px rgba(63,165,90,0.6);
 }
 
-/* ---------------- LIVE PREVIEW ---------------- */
+/* =========================================
+   DASHBOARD / CARDS (devices.html)
+   - بطاقات القياسات
+   - قسم التحذير الحالي
+   - جدول آخر القراءات
+========================================= */
 
+.dashboard-shell {
+  max-width: 1280px;
+  margin: 2rem auto 4rem;
+  padding: 0 1rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.live-row {
+  display: grid;
+  grid-template-columns: minmax(300px,400px);
+  justify-content: center;
+}
+
+@media(min-width: 900px){
+  .live-row {
+    grid-template-columns: minmax(300px,400px);
+    justify-content: center;
+  }
+}
+
+/* نفس ستايل الكارد السابق لكن أنظف */
 .live-preview-card {
-  background: #fff;
+  background: var(--bg-hard);
   border-radius: var(--radius-lg);
   border: 1px solid rgba(0,0,0,0.05);
   box-shadow: var(--shadow-card);
@@ -252,6 +311,7 @@ body {
   font-weight: 600;
   color: var(--accent-dark);
 }
+
 .live-device {
   font-size: .7rem;
   color: var(--text-dim);
@@ -261,6 +321,7 @@ body {
   border: 1px solid rgba(0,0,0,0.05);
 }
 
+/* شبكة القيم (حرارة/CO2/تعب/وضعية...) */
 .live-grid {
   display: grid;
   grid-template-columns: repeat(2,minmax(0,1fr));
@@ -277,27 +338,32 @@ body {
   flex-direction: column;
   gap: .4rem;
 }
+
 .live-label {
   font-size: .75rem;
   font-weight: 500;
   color: var(--text-dim);
 }
+
 .live-value {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-main);
 }
+
 .live-sub {
   font-size: .7rem;
   color: var(--text-dim);
   line-height: 1.4;
 }
 
+/* التعب الدائري */
 .live-fatigue-wrapper {
   display: flex;
   align-items: center;
   gap: .5rem;
 }
+
 .fatigue-circle {
   width: 48px;
   height: 48px;
@@ -309,6 +375,7 @@ body {
   align-items: center;
   justify-content: center;
 }
+
 .fatigue-num {
   font-size: .9rem;
   font-weight: 600;
@@ -323,9 +390,11 @@ body {
   flex-direction: column;
   gap: .5rem;
 }
+
 .tip {
   line-height: 1.5;
 }
+
 .see-full {
   font-size: .75rem;
   color: var(--accent-dark);
@@ -337,7 +406,87 @@ body {
   text-decoration: underline;
 }
 
-/* ---------------- WHY SECTION ---------------- */
+/* ====== جدول آخر القراءات ====== */
+
+.table-wrapper {
+  background: var(--bg-hard);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-card);
+  overflow-x: auto;
+  padding: 1rem 1rem 1.25rem;
+}
+
+.table-head-row {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--accent-dark);
+  background: var(--bg-soft);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  font-size: .8rem;
+  color: var(--text-main);
+  text-align: center;
+  direction: rtl;
+}
+
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding: .75rem .5rem;
+  white-space: nowrap;
+}
+
+.data-table th {
+  background: var(--bg-soft);
+  color: var(--accent-dark);
+  font-weight: 600;
+  font-size: .75rem;
+}
+
+.data-table td {
+  font-size: .8rem;
+  color: var(--text-main);
+}
+
+.data-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* تنبيه مباشر (مثلاً خطر جلسة/قرب شديد/هواء سيء) */
+.alert-banner {
+  background: var(--accent-dark);
+  color: #fff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-dark);
+  box-shadow: 0 18px 40px rgba(96,75,63,0.4);
+  font-size: .8rem;
+  line-height: 1.5;
+  padding: .8rem 1rem;
+  display: none; /* JS يغيرها الى block لما يجي alert فعلي */
+  margin-bottom: 1rem;
+}
+
+.alert-title {
+  font-weight: 600;
+  margin-bottom: .35rem;
+  font-size: .8rem;
+}
+
+.alert-desc {
+  color: rgba(255,255,255,0.8);
+  font-size: .75rem;
+  line-height: 1.5;
+}
+
+/* =========================================
+   ABOUT PAGE (about.html)
+   بطاقات "ليش GAIDESK" و "مين يحتاجه"
+========================================= */
 
 .section-wrapper {
   max-width: 1280px;
@@ -350,6 +499,7 @@ body {
   margin: 0 auto 2rem;
   text-align: center;
 }
+
 .section-title {
   font-size: 1.1rem;
   font-weight: 600;
@@ -357,11 +507,14 @@ body {
   color: var(--accent-dark);
   margin: 0 0 .5rem;
 }
+
 .section-desc {
   font-size: .9rem;
   color: var(--text-dim);
   line-height: 1.6;
   margin: 0;
+  max-width: 60ch;
+  display: inline-block;
 }
 
 .why-grid {
@@ -377,20 +530,21 @@ body {
   padding: 1rem 1rem 1.25rem;
   box-shadow: var(--shadow-card);
 }
+
 .info-title {
   font-size: .9rem;
   font-weight: 600;
   color: var(--accent-dark);
   margin-bottom: .5rem;
 }
+
 .info-desc {
   font-size: .8rem;
   color: var(--text-dim);
   line-height: 1.6;
 }
 
-/* ---------------- AUDIENCE ---------------- */
-
+/* الجمهور المستهدف */
 .audience-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(min(320px,100%),1fr));
@@ -404,21 +558,27 @@ body {
   box-shadow: var(--shadow-card);
   padding: 1rem 1rem 1.25rem;
 }
+
 .aud-head {
   font-size: .9rem;
   font-weight: 600;
   color: var(--accent-dark);
   margin-bottom: .5rem;
 }
+
 .aud-body {
   font-size: .8rem;
   color: var(--text-dim);
   line-height: 1.6;
 }
 
-/* ---------------- CTA / CALL TO ACTION ---------------- */
-
+/* CTA (دعوة للفعل) */
 .cta-card {
+  background: var(--bg-soft);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: var(--shadow-card);
+
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -426,16 +586,19 @@ body {
   padding: 1.5rem 1.25rem;
   justify-content: space-between;
 }
+
 .cta-main {
   flex: 1 1 260px;
   min-width: 260px;
 }
+
 .cta-text {
   font-size: 1rem;
   font-weight: 600;
   color: var(--accent-dark);
   margin-bottom: .5rem;
 }
+
 .cta-sub {
   font-size: .8rem;
   color: var(--text-dim);
@@ -443,13 +606,19 @@ body {
   max-width: 50ch;
 }
 
-/* ---------------- FOOTER ---------------- */
+/* =========================================
+   FOOTER
+   - حقوق
+   - made by Jana
+   - رابط لينكدإن
+========================================= */
 
 .site-footer {
   background: rgba(96,75,63,0.07);
   border-top: 1px solid rgba(0,0,0,0.08);
   margin-top: 4rem;
 }
+
 .footer-inner {
   max-width: 1280px;
   margin: 0 auto;
@@ -464,21 +633,34 @@ body {
 .foot-left {
   font-size: .8rem;
   line-height: 1.5;
+  min-width: 200px;
 }
+
 .foot-brand {
   font-size: .9rem;
   font-weight: 600;
   color: var(--accent-dark);
+  margin-bottom: .25rem;
 }
+
 .foot-copy {
   color: var(--accent-dark);
 }
+
 .foot-credit {
   color: var(--text-dim);
+  margin-top: .5rem;
+  line-height: 1.5;
 }
+
 .me {
   color: var(--accent-dark);
   font-weight: 500;
+  text-decoration: none;
+}
+
+.me:hover {
+  text-decoration: underline;
 }
 
 .foot-links {
@@ -488,11 +670,29 @@ body {
   gap: .4rem;
   min-width: 140px;
 }
+
 .footer-link {
   text-decoration: none;
   color: var(--accent-dark);
   font-weight: 500;
 }
+
 .footer-link:hover {
   text-decoration: underline;
+}
+
+/* =========================================
+   UTILITIES
+========================================= */
+
+.card-soft {
+  background: var(--bg-soft);
+  border: 1px solid var(--stroke-card);
+  backdrop-filter: blur(24px);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.hidden {
+  display: none !important;
 }
