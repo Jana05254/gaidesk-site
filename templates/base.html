@@ -1,42 +1,77 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ title or "GAIDESK" }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% if title %}{{ title }} · GAIDESK{% else %}GAIDESK{% endif %}</title>
+
+  <!-- خط (Tajawal أو أي خط عربي خفيف) -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- ستايلنا الرئيسي -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+
+  <style>
+    body {
+      direction: rtl;
+      text-align: right;
+      background: var(--bg-page);
+      color: var(--text-main);
+    }
+
+    /* navbar و footer جوا style.css برضو، لكن هنا بس ضمان */
+  </style>
 </head>
 <body>
 
-<nav class="navbar">
-  <div class="nav-inner">
+  <!-- NAV -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="brand">
+        <span class="logo-dot"></span>
+        <span class="brand-name">GAIDESK</span>
+        <span class="brand-badge">beta</span>
+      </div>
 
-    <a class="brand" href="{{ url_for('landing') }}">
-      <span class="logo-dot"></span>
-      <span class="brand-name">GAIDESK</span>
-      <span class="brand-badge">beta</span>
-    </a>
-
-    <div class="nav-links">
-      <a class="nav-link {% if request.endpoint == 'landing' %}active{% endif %}" href="{{ url_for('landing') }}">الرئيسية</a>
-      <a class="nav-link {% if request.endpoint == 'devices_page' %}active{% endif %}" href="{{ url_for('devices_page') }}">المراقبة الآن</a>
-      <a class="nav-link {% if request.endpoint == 'session_page' %}active{% endif %}" href="{{ url_for('session_page') }}">ملخص الجلسة</a>
-      <a class="nav-link {% if request.endpoint == 'about_page' %}active{% endif %}" href="{{ url_for('about_page') }}">عن المشروع</a>
+      <div class="nav-links">
+        <a class="nav-link" href="{{ url_for('landing') }}">الرئيسية</a>
+        <a class="nav-link" href="{{ url_for('devices_page') }}">المراقبة الآن</a>
+        <a class="nav-link" href="{{ url_for('session_page') }}">ملخص الجلسة</a>
+        <a class="nav-link" href="{{ url_for('about_page') }}">عن المشروع</a>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-{% block content %}{% endblock %}
+  <!-- الصفحة -->
+  <main style="min-height:60vh;">
+    {% block content %}{% endblock %}
+  </main>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="foot-left">
-      <div class="foot-brand">GAIDESK</div>
-      <div class="foot-copy">© {{ 2025 }} — كل الحقوق محفوظة</div>
-      <div class="foot-credit">Made by <a href="https://www.linkedin.com/in/jana-al-shahrani" target="_blank" class="me">Jana Khalban</a></div>
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+
+      <div class="foot-left">
+        <div class="foot-brand">GAIDESK</div>
+        <div class="foot-copy">مساعد مكتب ذكي يراقب جسمك بدل المؤقّت.</div>
+        <div class="foot-credit">
+          صنع بحب بواسطة
+          <span class="me">جنا خلبان</span>.
+        </div>
+      </div>
+
+      <div class="foot-links">
+        <a class="footer-link" href="{{ url_for('landing') }}">الرئيسية</a>
+        <a class="footer-link" href="{{ url_for('devices_page') }}">المراقبة الآن</a>
+        <a class="footer-link" href="{{ url_for('session_page') }}">ملخص الجلسة</a>
+        <a class="footer-link" href="{{ url_for('about_page') }}">عن المشروع</a>
+        <a class="footer-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+      </div>
+
     </div>
-  </div>
-</footer>
+  </footer>
 
 </body>
 </html>
