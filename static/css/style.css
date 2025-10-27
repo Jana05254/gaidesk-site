@@ -146,7 +146,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  text-align: center; /* لأننا نبغى اللوقو والنص وسط */
+  text-align: center;
   align-items: center;
 }
 
@@ -183,7 +183,6 @@ body {
   max-width: 30ch;
 }
 .main-headline {
-  /* نعطيه max-width محدد لأنه صار بالنص */
   max-width: 32ch;
 }
 
