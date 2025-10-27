@@ -1,221 +1,197 @@
 {% extends "base.html" %}
 {% block content %}
 
-<style>
-.hero-fade {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all .5s ease;
-}
-.hero-fade.ready {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* فقاعة الاتصال */
-.conn-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  font-size: .8rem;
-  font-weight: 500;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,0.07);
-  padding: .4rem .75rem;
-  line-height: 1.2;
-  background: rgba(0,0,0,0.03);
-  color: var(--text-dim);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.05);
-  transition: all .25s;
-}
-.conn-pill.online {
-  background: rgba(63,165,90,0.08);
-  border: 1px solid rgba(63,165,90,0.4);
-  color: #2f2f2f;
-  box-shadow: 0 16px 32px rgba(63,165,90,0.25);
-}
-.conn-dot {
-  width: .6rem;
-  height: .6rem;
-  border-radius: 999px;
-  background: #999;
-  box-shadow: 0 0 8px rgba(0,0,0,.2);
-}
-.conn-dot.on {
-  background: #3fa55a;
-  box-shadow: 0 0 10px rgba(63,165,90,0.7);
-}
-
-/* اللوقو الكبير */
-.big-logo-wrap {
-  text-align: center;
-}
-.big-logo {
-  width: 140px;
-  height: 140px;
-  border-radius: 28px;
-  background: radial-gradient(circle at 30% 30%, #fff 0%, #fff 40%, rgba(203,183,156,0.4) 100%);
-  border: 2px solid var(--accent-mid);
-  box-shadow:
-    0 30px 60px rgba(0,0,0,0.07),
-    0 0 60px rgba(203,183,156,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-main);
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: var(--accent-dark);
-  letter-spacing: -0.03em;
-}
-
-/* العناوين والنص */
-.tagline {
-  color: var(--accent-dark);
-  font-size: 1.2rem;
-  font-weight: 600;
-  line-height: 1.4;
-  text-align: center;
-  margin: 1rem auto .5rem;
-}
-.tag-desc {
-  color: var(--text-dim);
-  font-size: .9rem;
-  line-height: 1.6;
-  max-width: 40ch;
-  text-align: center;
-  margin: 0 auto 1.5rem;
-}
-
-.hero-cta {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: .75rem;
-}
-
-/* بطاقات تشويقية */
-.hero-tease-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(min(260px,100%),1fr));
-  gap: 1rem;
-  margin-top: 2.5rem;
-}
-.tease-card {
-  background: var(--bg-soft);
-  border: 1px solid rgba(0,0,0,0.05);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-  padding: 1rem 1rem 1.25rem;
-  font-size: .8rem;
-  line-height: 1.6;
-  color: var(--text-dim);
-}
-.tease-title {
-  color: var(--accent-dark);
-  font-size: .9rem;
-  font-weight: 600;
-  margin-bottom: .4rem;
-}
-</style>
-
+<!-- HERO SECTION -->
 <section class="hero-section">
-  <div class="hero-content card-soft hero-fade"
-       id="heroWrap"
-       style="display:block; grid-template-columns:1fr; text-align:center;">
 
-    <!-- اللوقو الكبير -->
-<div class="big-logo">
-  <img src="{{ url_for('static', filename='logo.png') }}"
-       alt="GAIDESK"
-       style="max-width:80%; max-height:80%; object-fit:contain;">
-</div>
+  <div class="hero-content card-soft">
 
+    <!-- العمود الأيسر: النص -->
+    <div class="hero-left">
 
-
-      -->
-
-      <!-- نسخة نصية مؤقتاً -->
-      <div class="big-logo">
-        GAIDESK
+      <!-- لوقو كبير وسط -->
+      <div class="hero-logo-block">
+        <div class="hero-logo-circle">
+          <span class="hero-logo-text">GAIDESK</span>
+        </div>
       </div>
+
+      <!-- العنوان التسويقي -->
+      <h1 class="hero-title main-headline">
+        مساعد مكتب ذكي يراقب صحتك ويُحسّن أداءك.
+      </h1>
+
+      <!-- الوصف التسويقي -->
+      <p class="hero-desc">
+        GAIDESK يتابع جلستك، تنفسك، قربك من الشاشة، وجود جسمك على المكتب، وجودة الهواء حولك.
+        عند ظهور مؤشرات إرهاق أو وضع غير صحي، الجهاز يتدخل فورًا لينبّهك ويقترح عليك استراحة قصيرة
+        قبل أن يتحول الإجهاد إلى ألم مزمن أو تشتت دائم.
+      </p>
+
+      <!-- CTA -->
+      <div class="hero-cta">
+        <a class="btn-primary large" href="{{ url_for('devices_page') }}">
+          راقب الجلسة الآن
+        </a>
+        <a class="btn-ghost" href="{{ url_for('about_page') }}">
+          ما هو GAIDESK؟
+        </a>
+      </div>
+
+      <!-- حالة الاتصال (تظهر من الـ JS فقط إذا في بيانات حية) -->
+      <div class="hero-note device-online" style="display:none;">
+        <span class="dot-status dot-ok"></span>
+        <span>الجهاز متصل الآن ويرسل قراءات حقيقية.</span>
+      </div>
+
     </div>
 
-    <!-- نبذة بسيطة -->
-    <h1 class="tagline">مساعد مكتب ذكي… يراقب جسمك بدل المؤقّت.</h1>
-    <p class="tag-desc">
-      GAIDESK يتابع وضعيتك، تنفسك، بعدك عن الشاشة، وجودك على المكتب،
-      وجودة الهواء. لما جسمك يتعب فعلاً، يعطيك تنبيه أو يجبرك تاخذ بريك.
-    </p>
-
-    <!-- حالة الاتصال - ما تظهر إلا لو فعلاً في بيانات -->
-    <div style="margin-bottom:1.25rem;">
-      <span id="connStatus" class="conn-pill" style="display:none;">
-        <span id="connDot" class="conn-dot"></span>
-        <span id="connText">الجهاز غير متصل</span>
-      </span>
-    </div>
-
-    <!-- أزرار -->
-    <div class="hero-cta">
-      <a class="btn-primary large" href="{{ url_for('devices_page') }}">
-        راقب جسمي الآن
-      </a>
-      <a class="btn-ghost" href="{{ url_for('about_page') }}">
-        وش هو GAIDESK؟
-      </a>
-      <a class="btn-ghost" href="{{ url_for('session_page') }}">
-        ملخص جلستي
-      </a>
-    </div>
-
-    <!-- 3 كروت توضح القيمة -->
-    <div class="hero-tease-row">
-      <div class="tease-card">
-        <div class="tease-title">إجهاد الجسم %</div>
-        مو مؤقّت كل 30 دقيقة. نرصد تعبك الحقيقي (تنفسك، جلستك، تركيزك العنيف)
-        ونقولك "وقف الآن" لما جسمك هو اللي يقول خلاص.
+    <!-- العمود الأيمن: معاينة حية مبسطة -->
+    <div class="live-preview-card">
+      <div class="live-header">
+        <div class="live-title">القياسات الحية</div>
+        <div class="live-device" id="liveDeviceLabel">GAIDESK</div>
       </div>
-      <div class="tease-card">
-        <div class="tease-title">هواء المكتب</div>
-        CO₂ عالي؟ حرارة خانقة؟
-        نقولك تفتح شباك أو تتحرك قبل ما يطيح تركيزك.
-      </div>
-      <div class="tease-card">
-        <div class="tease-title">بريك إجباري</div>
-        لو وصلت 100% Fatigue: الجلسة تنتهي.
-        ما في تفاوض. لأن جسمك أهم من التسكيت.
-      </div>
-    </div>
 
-  </div>
+      <div class="live-grid">
+
+        <div class="live-item">
+          <div class="live-label">درجة الحرارة</div>
+          <div class="live-value" id="liveTemp">--°C</div>
+          <div class="live-sub" id="liveTempNote">مريح</div>
+        </div>
+
+        <div class="live-item">
+          <div class="live-label">الجودة الهوائية (CO₂)</div>
+          <div class="live-value"><span id="liveCO2">ppm --</span></div>
+          <div class="live-sub" id="liveCO2Note">الهواء جيد</div>
+        </div>
+
+        <div class="live-item">
+          <div class="live-label">وضع الجلسة</div>
+          <div class="live-value" id="livePresence">—</div>
+          <div class="live-sub" id="liveDist">المسافة: — سم</div>
+        </div>
+
+        <div class="live-item">
+          <div class="live-label">مؤشر الإرهاق اللحظي</div>
+          <div class="live-fatigue-wrapper">
+            <div class="fatigue-circle">
+              <span class="fatigue-num" id="liveFatigueNum">0%</span>
+            </div>
+            <div class="live-sub" id="liveFatigueNote">
+              آمن الآن. الجهاز سيتدخل قبل أن يتفاقم الإجهاد.
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /live-grid -->
+
+      <div class="live-footer">
+        <div class="tip">
+          هذا جزء من القراءات التي يجمعها GAIDESK بشكل مباشر من مكتبك، ليمنع الإرهاق قبل أن يبدأ.
+        </div>
+        <a class="see-full" href="{{ url_for('devices_page') }}">
+          عرض لوحة المراقبة الكاملة →
+        </a>
+      </div>
+
+    </div><!-- /live-preview-card -->
+
+  </div><!-- /hero-content card-soft -->
 </section>
 
-<script>
-// أنيميشن دخول بسيط
-window.addEventListener('load', () => {
-  document.getElementById('heroWrap').classList.add('ready');
-});
 
-// نفحص إذا الجهاز فعلاً شغال (في بيانات في /api/data)
-async function checkConnection(){
-  try {
-    const r = await fetch('/api/data?limit=1&device=GAIDESK-01');
-    const data = await r.json();
-    if (Array.isArray(data) && data.length > 0){
-      const pill = document.getElementById('connStatus');
-      const dot  = document.getElementById('connDot');
-      const txt  = document.getElementById('connText');
-      pill.style.display = 'inline-flex';
-      pill.classList.add('online');
-      dot.classList.add('on');
-      txt.textContent = "الجهاز متصل الآن";
-    }
-  } catch(e){
-    // ما نعرض شي لو فشل الاتصال
-  }
-}
-checkConnection();
-</script>
+<!-- WHY SECTION -->
+<section class="section-wrapper">
+  <div class="section-head">
+    <h2 class="section-title">لماذا أحتاج هذا الجهاز؟</h2>
+    <p class="section-desc">
+      الجلوس الطويل، التركيز العميق، الهواء المغلق، والإجهاد الصامت… كلها عوامل تضع ضغطًا حقيقيًا
+      على جسدك دون أن تشعر. GAIDESK صُمّم ليكون يقظًا بدلًا عنك، ويعيدك إلى وضع صحي قبل فوات الأوان.
+    </p>
+  </div>
+
+  <div class="why-grid">
+
+    <div class="info-card">
+      <div class="info-title">يراقب الجلسة والتنفس</div>
+      <div class="info-desc">
+        يتابع وضعك، مسافة وجهك عن الشاشة، نمط تنفسك، وإشارات الإجهاد البدني.
+        ليس تنبيهًا زمنيًا عشوائيًا؛ بل يعتمد على حالة جسمك الفعلية.
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-title">ينبّهك في اللحظة الصحيحة</div>
+      <div class="info-desc">
+        عند ارتفاع المؤشرات الخطرة (قرب شديد من الشاشة، تنفس مضطرب، مستوى إجهاد مرتفع)
+        يطلب منك استراحة ذكية قصيرة، بدل أن تنتظر حتى تشعر بالألم المتأخر.
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-title">يحافظ على إنتاجيتك</div>
+      <div class="info-desc">
+        الفكرة ليست أن تتوقف كل خمس دقائق. الفكرة أن تمنع الانهيار.
+        جهازك يساعدك أن تعمل بتركيز واضح ومدى أطول، لكن بأمان.
+      </div>
+    </div>
+
+  </div><!-- /why-grid -->
+</section>
+
+
+<!-- AUDIENCE SECTION -->
+<section class="section-wrapper">
+  <div class="section-head">
+    <h2 class="section-title">مَن المستفيد؟</h2>
+    <p class="section-desc">
+      GAIDESK مناسب لكل من يعمل فترات طويلة أمام الشاشة أو ينسى العناية بجسده أثناء التركيز.
+    </p>
+  </div>
+
+  <div class="audience-grid">
+
+    <div class="aud-card">
+      <div class="aud-head">الأشخاص ذوو التركيز العميق</div>
+      <div class="aud-body">
+        مبرمجون، باحثون، طلاب يستعدّون لاختبارات مهمّة… أشخاص يمكنهم أن ينسوا الوقت
+        تمامًا. الجهاز يُبقي الجسد في الصورة حتى لو العقل كان مشغولًا بالكامل بالعمل.
+      </div>
+    </div>
+
+    <div class="aud-card">
+      <div class="aud-head">العمل المكتبي الطويل</div>
+      <div class="aud-body">
+        موظفو مكاتب، مستخدمو الحاسوب لساعات متواصلة، العاملون عن بُعد.
+        الجهاز يراقب جودة الهواء، مستوى التوتر الجسدي، ويمنع الإجهاد من التراكم بصمت.
+      </div>
+    </div>
+
+  </div><!-- /audience-grid -->
+</section>
+
+
+<!-- CTA / CALL TO ACTION -->
+<section class="section-wrapper">
+  <div class="card-soft cta-card">
+    <div class="cta-main">
+      <div class="cta-text">ابدأ في متابعة جلساتك الآن</div>
+      <div class="cta-sub">
+        يمكنك مشاهدة آخر جلسة، مؤشرات الإجهاد (Fatigue)، جودة الهواء، ووقت الجلوس،
+        مباشرة من الويب.
+      </div>
+    </div>
+    <div class="cta-ctaBtns">
+      <a class="btn-primary" href="{{ url_for('devices_page') }}">
+        فتح لوحة المراقبة
+      </a>
+      <a class="btn-ghost" href="{{ url_for('session_page') }}">
+        ملخص الجلسة الأخيرة
+      </a>
+    </div>
+  </div>
+</section>
 
 {% endblock %}

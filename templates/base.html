@@ -48,30 +48,29 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-
-      <div class="foot-left">
-        <div class="foot-brand">GAIDESK</div>
-        <div class="foot-copy">مساعد مكتب ذكي يراقب جسمك بدل المؤقّت.</div>
-        <div class="foot-credit">
-          صنع بحب بواسطة
-          <span class="me">جنا خلبان</span>.
-        </div>
+ <footer class="site-footer">
+  <div class="footer-inner">
+    <div class="foot-left">
+      <div class="foot-brand">GAIDESK</div>
+      <div class="foot-copy">© {{ now_year }} GAIDESK. جميع الحقوق محفوظة.</div>
+      <div class="foot-credit">
+        Built by <span class="me">Jana Khalban</span>
       </div>
-
-      <div class="foot-links">
-        <a class="footer-link" href="{{ url_for('landing') }}">الرئيسية</a>
-        <a class="footer-link" href="{{ url_for('devices_page') }}">المراقبة الآن</a>
-        <a class="footer-link" href="{{ url_for('session_page') }}">ملخص الجلسة</a>
-        <a class="footer-link" href="{{ url_for('about_page') }}">عن المشروع</a>
-        <a class="footer-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">
-          LinkedIn
-        </a>
-      </div>
-
     </div>
-  </footer>
+
+    <div class="foot-links">
+      <a class="footer-link" href="{{ url_for('landing') }}">الصفحة الرئيسية</a>
+      <a class="footer-link" href="{{ url_for('devices_page') }}">لوحة المراقبة</a>
+      <a class="footer-link" href="{{ url_for('session_page') }}">ملخص الجلسة</a>
+      <a class="footer-link" href="{{ url_for('about_page') }}">عن GAIDESK</a>
+      <!-- لو عندك لينكدإن -->
+      <a class="footer-link" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+        LinkedIn
+      </a>
+    </div>
+  </div>
+</footer>
+
 
 </body>
 </html>
