@@ -1,89 +1,42 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-
-    <title>{% block title %}GAIDESK{% endblock %}</title>
-
-    <!-- الخطوط -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap"
-        rel="stylesheet"
-    />
-
-    <!-- ستايل عام -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-
-    <style>
-        body {
-            margin: 0;
-            background-color: #f5f7f2; /* خلفية خفيفة تميل لأخضر باهت/أوف وايت */
-            color: #1a1a1a;
-            font-family: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title or "GAIDESK" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
 
-    <!-- الهيدر / شريط التنقل -->
-    <header class="site-header" dir="rtl">
-        <div class="nav-wrap">
+<nav class="navbar">
+  <div class="nav-inner">
 
-            <div class="nav-left">
-                <a class="brand-mini" href="{{ url_for('home') }}">
-                    GAIDESK
-                </a>
-            </div>
+    <a class="brand" href="{{ url_for('landing') }}">
+      <span class="logo-dot"></span>
+      <span class="brand-name">GAIDESK</span>
+      <span class="brand-badge">beta</span>
+    </a>
 
-            <nav class="nav-links">
-                <a href="{{ url_for('home') }}" class="nav-link">الرئيسية</a>
-                <a href="{{ url_for('devices_page') }}" class="nav-link">المراقبة الآن</a>
-                <a href="{{ url_for('about_page') }}" class="nav-link">عن المشروع</a>
-                {# لو عندك صفحة ملخص جلسة فعلًا #}
-                {# <a href="{{ url_for('session_page') }}" class="nav-link">ملخص الجلسة</a> #}
-            </nav>
+    <div class="nav-links">
+      <a class="nav-link {% if request.endpoint == 'landing' %}active{% endif %}" href="{{ url_for('landing') }}">الرئيسية</a>
+      <a class="nav-link {% if request.endpoint == 'devices_page' %}active{% endif %}" href="{{ url_for('devices_page') }}">المراقبة الآن</a>
+      <a class="nav-link {% if request.endpoint == 'session_page' %}active{% endif %}" href="{{ url_for('session_page') }}">ملخص الجلسة</a>
+      <a class="nav-link {% if request.endpoint == 'about_page' %}active{% endif %}" href="{{ url_for('about_page') }}">عن المشروع</a>
+    </div>
+  </div>
+</nav>
 
-        </div>
-    </header>
+{% block content %}{% endblock %}
 
-    <!-- المحتوى الخاص بكل صفحة -->
-    <main id="page-content">
-        {% block content %}{% endblock %}
-    </main>
-
-    <!-- الفوتر -->
-    <footer class="main-footer" dir="rtl">
-        <div class="footer-inner">
-
-            <div class="footer-left">
-                <p class="made-by">
-                    صنع بواسطة
-                    <span class="sig">Jana Khalban</span>
-                </p>
-                <p class="rights">© {{ current_year }} GAIDESK – جميع الحقوق محفوظة</p>
-            </div>
-
-            <div class="footer-links">
-                <a href="https://www.linkedin.com" target="_blank" class="footer-link">
-                    Linkedin
-                </a>
-                <a href="{{ url_for('about_page') }}" class="footer-link">
-                    عن المشروع
-                </a>
-                <a href="{{ url_for('devices_page') }}" class="footer-link">
-                    المراقبة الآن
-                </a>
-            </div>
-
-        </div>
-    </footer>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="foot-left">
+      <div class="foot-brand">GAIDESK</div>
+      <div class="foot-copy">© {{ 2025 }} — كل الحقوق محفوظة</div>
+      <div class="foot-credit">Made by <a href="https://www.linkedin.com/in/jana-al-shahrani" target="_blank" class="me">Jana Khalban</a></div>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>

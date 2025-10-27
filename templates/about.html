@@ -1,75 +1,30 @@
 {% extends "base.html" %}
-{% block title %}عن GAIDESK{% endblock %}
-
 {% block content %}
 
-<section class="about-wrapper" dir="rtl">
-    <div class="about-inner">
+<div class="section-wrapper">
+  <div class="section-head">
+    <h2 class="section-title">ما هو GAIDESK؟</h2>
+    <p class="section-desc">
+      GAIDESK جهاز ذكي للمكتب يساعدك تتابع جلساتك الطويلة ويراقب التعب عبر تحليل التنفس والهواء ووضعية الجلوس. يذكّرك بلطف قبل ما تتعب.
+    </p>
+  </div>
 
-        <h1 class="about-head">وش هو GAIDESK؟</h1>
-
-        <p class="about-lead">
-            GAIDESK جهاز مكتبي يراقب جسمك (الوضعية، المسافة، التنفس، الإجهاد) والبيئة حولك
-            (ثاني أكسيد الكربون، الحرارة). ما ينبهك بعد مؤقت ثابت، لكنه يفهم تعبك الفعلي
-            ويقول لك "وقف" لما جسمك فعلاً يبدأ يطيح.
-        </p>
-
-        <div class="about-grid">
-
-            <div class="about-card">
-                <h2 class="card-title">ليش هو مختلف؟</h2>
-                <p class="card-body">
-                    أغلب "التذكير بالوقفة" يشتغل بمؤقت ثابت (مثلاً كل 30 دقيقة).
-                    GAIDESK يبني خط أساس خاص فيك أول ما تبدأ الجلسة، ويتابع كيف جسمك يتغير
-                    مع الوقت، وينبهك بس وقت ما يصير الإجهاد حقيقي.
-                </p>
-            </div>
-
-            <div class="about-card">
-                <h2 class="card-title">مين يحتاجه؟</h2>
-                <p class="card-body">
-                    ناس يركزون لساعات وينسون جسمهم (مبرمجين، طلاب تحضير للاختبارات،
-                    ناس بفرط تركيز)، وأي شخص يجلس قدام مكتب لفترات طويلة.
-                </p>
-            </div>
-
-            <div class="about-card">
-                <h2 class="card-title">وش يسوي أثناء الجلسة؟</h2>
-                <p class="card-body">
-                    يراقب المسافة عن الشاشة، جودة الهواء، تنفسك، وإجهادك.
-                    يعطي مراحل إنذار تدريجية تبدأ بـ"خذ بريك بسيط"
-                    إلى "قف الآن" لما الإجهاد يوصل 100%.
-                </p>
-            </div>
-
-            <div class="about-card">
-                <h2 class="card-title">نقطة الانهيار</h2>
-                <p class="card-body">
-                    كل جلسة لها رقم "إجهاد الجلسة".
-                    لما يوصل 100%، كأن جسمك يقول "ما عاد أقدر".
-                    الجهاز وقتها يطلب استراحة حقيقية، مو مجرد نصيحة ودّية.
-                </p>
-            </div>
-
-            <div class="about-card">
-                <h2 class="card-title">البيئة حوالينك</h2>
-                <p class="card-body">
-                    يقيس CO₂ ودرجة الحرارة. لو الهواء خانق، تركيزك يطيح حتى لو أنت
-                    جالس "كويس". يحذرك قبل ما تكتشف أنك تعبان وما تقدر تكمل.
-                </p>
-            </div>
-
-            <div class="about-card">
-                <h2 class="card-title">بعد كل جلسة</h2>
-                <p class="card-body">
-                    بعد ما تخلص، GAIDESK يعطيك ملخص: متى بدأت تنهار، وش كان السبب
-                    (هواء، وضعية، قرب من الشاشة)، وكيف تحسّن الجلسة اللي بعدها.
-                </p>
-            </div>
-
-        </div>
-
+  <div class="why-grid">
+    <div class="info-card">
+      <div class="info-title">ليش GAIDESK مختلف؟</div>
+      <div class="info-desc">يجمع بين الذكاء الاصطناعي والراحة الفعلية، يعطيك تحليل لكل جلسة ويذكّرك بأسلوب غير مزعج.</div>
     </div>
-</section>
+
+    <div class="info-card">
+      <div class="info-title">كيف يخدم المستخدم؟</div>
+      <div class="info-desc">يراقب المؤشرات الحيوية وجودة الهواء لحظيًا، ويحافظ على تركيزك دون توتر أو انقطاع.</div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-title">من يحتاجه؟</div>
+      <div class="info-desc">أي شخص يجلس لساعات طويلة: مبرمج، مصمم، أو طالب — يساعدك تحافظ على صحتك وانتجيتك.</div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
