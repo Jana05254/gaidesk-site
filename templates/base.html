@@ -1,59 +1,55 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title or "GAIDESK" }}</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% if title %}{{ title }} · GAIDESK{% else %}GAIDESK{% endif %}</title>
 
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
 
-  <!-- أي CSS إضافي مخصص لصفحات ثانية (لو موجود) -->
-  {% block extra_css %}{% endblock %}
+  <meta name="color-scheme" content="light only" />
 </head>
 <body>
 
   <!-- NAV -->
-  <nav class="navbar">
+  <header class="navbar">
     <div class="nav-inner">
-      <div class="brand">
+      <nav class="nav-links" style="flex-wrap:wrap;gap:1rem;">
+        <a class="nav-link {% if request.path=='/' %}active{% endif %}" href="{{ url_for('landing') }}">الرئيسية</a>
+        <a class="nav-link {% if request.path.startswith('/dashboard') %}active{% endif %}" href="{{ url_for('devices_page') }}">لوحة المراقبة</a>
+        <a class="nav-link {% if request.path.startswith('/session') %}active{% endif %}" href="{{ url_for('session_page') }}">ملخص الجلسة</a>
+        <a class="nav-link {% if request.path.startswith('/about') %}active{% endif %}" href="{{ url_for('about_page') }}">عن المشروع</a>
+      </nav>
+
+      <div class="brand" style="margin-inline-start:auto;">
         <div class="logo-dot"></div>
         <div class="brand-name">GAIDESK</div>
         <div class="brand-badge">Beta</div>
       </div>
-
-      <div class="nav-links">
-        <a class="nav-link {% if request.endpoint == 'landing' %}active{% endif %}"
-           href="{{ url_for('landing') }}">الرئيسية</a>
-
-        <a class="nav-link {% if request.endpoint == 'devices_page' %}active{% endif %}"
-           href="{{ url_for('devices_page') }}">لوحة المراقبة</a>
-
-        <a class="nav-link {% if request.endpoint == 'session_page' %}active{% endif %}"
-           href="{{ url_for('session_page') }}">ملخص الجلسة</a>
-
-        <a class="nav-link {% if request.endpoint == 'about_page' %}active{% endif %}"
-           href="{{ url_for('about_page') }}">عن المشروع</a>
-      </div>
     </div>
-  </nav>
+  </header>
 
-  <!-- MAIN CONTENT -->
-  <main>
+  <!-- PAGE CONTENT -->
+  <main style="min-height:60vh;">
     {% block content %}{% endblock %}
   </main>
 
   <!-- FOOTER -->
   <footer class="site-footer">
     <div class="footer-inner">
-
       <div class="foot-left">
         <div class="foot-brand">GAIDESK</div>
-        <div class="foot-copy">© {{ now_year if now_year else "2025" }} GAIDESK. جميع الحقوق محفوظة.</div>
+        <div class="foot-copy">
+          © 2025 GAIDESK. جميع الحقوق محفوظة.
+        </div>
         <div class="foot-credit">
-          تم التطوير بواسطة <span class="me">Jana</span>
+          تم التطوير بواسطة
+          <span class="me">Jana Khalban</span>
         </div>
       </div>
 
@@ -62,17 +58,10 @@
         <a class="footer-link" href="{{ url_for('devices_page') }}">لوحة المراقبة</a>
         <a class="footer-link" href="{{ url_for('session_page') }}">ملخص الجلسة</a>
         <a class="footer-link" href="{{ url_for('about_page') }}">عن المشروع</a>
-        <a class="footer-link" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
-          LinkedIn
-        </a>
+        <a class="footer-link" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       </div>
-
     </div>
   </footer>
 
-  <!-- سكربت عام -->
-  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-
-  {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,181 +1,79 @@
 {% extends "base.html" %}
 {% block content %}
 
-<style>
-.sess-wrap {
-  max-width: 800px;
-  margin: 2rem auto 4rem;
-  padding: 1.5rem;
-  background: var(--bg-soft);
-  border: 1px solid rgba(0,0,0,0.05);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  opacity:0;
-  transform: translateY(20px);
-  transition: all .5s;
-}
-
-.sess-head {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-.sess-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--accent-dark);
-  margin: 0 0 .5rem;
-}
-.sess-desc {
-  font-size: .9rem;
-  color: var(--text-dim);
-  margin: 0 auto;
-  line-height: 1.6;
-  max-width: 46ch;
-  text-align: center;
-}
-
-.sess-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(min(240px,100%),1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-.sess-card {
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.05);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-  padding: 1rem;
-  font-size: .85rem;
-  line-height: 1.5;
-  color: var(--text-main);
-}
-.sess-label {
-  font-size: .75rem;
-  font-weight: 500;
-  color: var(--text-dim);
-  margin-bottom: .25rem;
-}
-.sess-value {
-  font-size: .95rem;
-  font-weight: 600;
-  color: var(--accent-dark);
-}
-
-.sess-hint-block {
-  background: rgba(203,183,156,0.08);
-  border: 1px solid rgba(203,183,156,0.4);
-  border-radius: var(--radius-md);
-  padding: .75rem .9rem;
-  box-shadow: 0 16px 32px rgba(203,183,156,0.18);
-  font-size: .8rem;
-  line-height: 1.6;
-  color: var(--accent-dark);
-  font-weight: 500;
-  text-align: center;
-}
-</style>
-
-<div class="sess-wrap" id="sessWrap">
-  <div class="sess-head">
-    <h1 class="sess-title">ملخص آخر جلسة</h1>
-    <p class="sess-desc">
-      تحليل آخر جلسة مسجلة من GAIDESK:
-      المدة، مستوى الإجهاد، وعدد التنبيهات الحرجة.
+<section class="section-wrapper">
+  <div class="section-head">
+    <h2 class="section-title">ملخص الجلسة</h2>
+    <p class="section-desc">
+      نظرة سريعة على آخر جلسة تم تسجيلها: مستوى الإجهاد، جودة البيئة، والتنبيهات التي ظهرت.
     </p>
   </div>
 
-  <div class="sess-grid">
-    <div class="sess-card">
-      <div class="sess-label">مدة الجلسة</div>
-      <div class="sess-value" id="durVal">-- دقيقة</div>
+  <div class="card-soft" style="padding:1rem 1rem 1.5rem;border-radius:var(--radius-lg);">
+    <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start;">
+
+      <div style="flex:1 1 180px;min-width:180px;">
+        <div class="info-card" style="box-shadow:none;background:var(--bg-soft);">
+          <div class="info-title">تنبيهات إجهاد عالٍ جداً</div>
+          <div class="info-desc">
+            <span id="sum-warn-high">—</span> مرة
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1 1 180px;min-width:180px;">
+        <div class="info-card" style="box-shadow:none;background:var(--bg-soft);">
+          <div class="info-title">مدة الجلسة</div>
+          <div class="info-desc">
+            <span id="sum-duration">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex:1 1 220px;min-width:220px;">
+        <div class="info-card" style="box-shadow:none;background:var(--bg-soft);">
+          <div class="info-title">الوضع النهائي</div>
+          <div class="info-desc" id="sum-final-state">—</div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="sess-card">
-      <div class="sess-label">حالة النهاية</div>
-      <div class="sess-value" id="finalStateVal">--</div>
-    </div>
-
-    <div class="sess-card">
-      <div class="sess-label">تنبيهات وضعية/مسافة</div>
-      <div class="sess-value"><span id="nearAlerts">0</span> مرة</div>
-    </div>
-
-    <div class="sess-card">
-      <div class="sess-label">تنبيهات جودة الهواء</div>
-      <div class="sess-value"><span id="co2Alerts">0</span> مرة</div>
-    </div>
-
-    <div class="sess-card">
-      <div class="sess-label">تحذيرات إجهاد متوسط</div>
-      <div class="sess-value"><span id="warn1Alerts">0</span> مرة</div>
-    </div>
-
-    <div class="sess-card">
-      <div class="sess-label">تحذيرات إجهاد عالي جدًا</div>
-      <div class="sess-value"><span id="warn2Alerts">0</span> مرة</div>
+    <!-- تم حذف الفقرة باللهجة بالكامل -->
+    <div class="hero-cta" style="margin-top:1.5rem;flex-wrap:wrap;gap:.75rem;">
+      <a class="btn-primary" href="{{ url_for('landing') }}">الصفحة الرئيسية</a>
+      <a class="btn-ghost" href="{{ url_for('devices_page') }}">رجعني للوحة المراقبة</a>
     </div>
   </div>
-
-  <div class="sess-hint-block" id="sessionHint">
-    نستخدم تعبك الحقيقي كمؤشر.
-    مو لازم تجلس “مضبوط” طول الوقت، الأهم إنك ترجع بسرعة لما جسمك يتعب.
-  </div>
-
-  <div style="text-align:center; margin-top:2rem;">
-    <a class="btn-ghost" href="{{ url_for('devices_page') }}">رجعني للوحة المراقبة</a>
-    <a class="btn-primary" href="{{ url_for('landing') }}" style="margin-right:.5rem;">الصفحة الرئيسية</a>
-  </div>
-</div>
+</section>
 
 <script>
-// حركة دخول
-window.addEventListener('load', () => {
-  const w = document.getElementById('sessWrap');
-  w.style.opacity = "1";
-  w.style.transform = "translateY(0)";
-});
-
-// نجيب الملخص من /api/session-summary
-async function fetchSummary() {
+async function loadSummary(){
   try {
-    const res = await fetch('/api/session-summary?device=GAIDESK-01');
-    if(!res.ok) return;
+    const res = await fetch("/api/session-summary?device=GAIDESK-01");
+    if(!res.ok){ return; }
     const data = await res.json();
 
-    // مدة
-    if(data.duration_sec != null){
-      const mins = Math.round(data.duration_sec / 60);
-      durVal.textContent = mins + " دقيقة تقريباً";
+    // تنبيهات شديدة
+    const alerts = data.alerts || {};
+    const highCount = (alerts.warn2 ?? alerts.high ?? 0);
+    document.getElementById("sum-warn-high").textContent = highCount;
+
+    // المدة
+    if (data.duration_sec){
+      const mins = Math.floor(data.duration_sec/60);
+      document.getElementById("sum-duration").textContent = mins+" دقيقة تقريباً";
     }
 
-    // حالة النهاية
-    finalStateVal.textContent = data.final_state || data.status || '—';
-
-    // Alerts
-    const al = data.alerts || {};
-    nearAlerts.textContent  = al.near  ?? 0;
-    co2Alerts.textContent   = al.co2   ?? 0;
-    warn1Alerts.textContent = al.warn1 ?? 0;
-    warn2Alerts.textContent = al.warn2 ?? 0;
-
-    // نص تشجيعي ديناميكي
-    if ((al.warn2 ?? 0) > 0 || ((al.near ?? 0) + (al.co2 ?? 0)) >= 3) {
-      sessionHint.textContent =
-        "جلسة كانت متعبة فعلاً. حاول تقسّم الشغل على فترات أقصر، واهتم بالتنفس والبعد عن الشاشة.";
-    } else if ((al.warn1 ?? 0) > 0) {
-      sessionHint.textContent =
-        "مو سيئة! بس جسمك عطاك إنذارات تعب. بريكات صغيرة قبل ما توصل 100% تساعد.";
-    } else {
-      sessionHint.textContent =
-        "ممتاز. جلسة تقريباً نظيفة. استمر بنفس وعيك بالمسافة والتنفس.";
+    // الحالة النهائية
+    if (data.final_state){
+      document.getElementById("sum-final-state").textContent = data.final_state;
     }
   } catch(e){
-    // لو فشل الاتصال، نخلي الرسالة الافتراضية
+    console.warn("summary load failed", e);
   }
 }
-
-fetchSummary();
+loadSummary();
 </script>
 
 {% endblock %}
